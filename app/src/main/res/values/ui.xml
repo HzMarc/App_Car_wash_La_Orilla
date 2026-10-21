@@ -1,0 +1,48 @@
+<resources>
+    <style name="Orilla.SectionTabs" parent="Widget.Material3.TabLayout">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:background">@color/app_bg</item>
+        <item name="tabIndicatorColor">@color/app_yellow</item>
+        <item name="tabIndicatorHeight">3dp</item>
+        <item name="tabSelectedTextColor">@color/app_black</item>
+        <item name="tabTextColor">@color/app_text_secondary</item>
+        <item name="tabMode">fixed</item>
+        <item name="tabGravity">fill</item>
+    </style>
+    <style name="Orilla.ScreenTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/app_black</item>
+    </style>
+    <style name="Orilla.Button" parent="Widget.Material3.Button">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="backgroundTint">@color/app_black</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    <style name="Orilla.Button.Add" parent="Orilla.Button">
+        <item name="backgroundTint">@color/app_yellow</item>
+        <item name="android:textColor">@color/app_black</item>
+        <item name="iconTint">@color/app_black</item>
+    </style>
+    <style name="Orilla.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="strokeColor">@color/app_black</item>
+        <item name="strokeWidth">1.5dp</item>
+        <item name="android:textColor">@color/app_black</item>
+    </style>
+    <style name="Orilla.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">@color/app_card_bg</item>
+        <item name="colorSurfaceContainerHigh">@color/app_card_bg</item>
+        <item name="buttonBarPositiveButtonStyle">@style/Orilla.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Orilla.Button.Outlined</item>
+    </style>
+</resources>

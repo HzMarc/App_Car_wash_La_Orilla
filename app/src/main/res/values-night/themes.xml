@@ -1,0 +1,18 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Car_wash_La_Orilla" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/app_black</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/app_yellow</item>
+        <item name="colorOnSecondary">@color/app_black</item>
+        <item name="materialAlertDialogTheme">@style/Orilla.Dialog</item>
+        <item name="colorSurface">@color/app_card_bg</item>
+        <item name="colorOnSurface">@color/app_black</item>
+        <item name="colorOnSurfaceVariant">@color/app_text_secondary</item>
+        <item name="colorSurfaceVariant">@color/app_card_selected</item>
+        <item name="colorOutline">@color/app_border</item>
+        <item name="android:windowBackground">@color/app_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>
+</resources>

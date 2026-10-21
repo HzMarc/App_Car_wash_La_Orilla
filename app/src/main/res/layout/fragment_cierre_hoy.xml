@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/bg">
+    <androidx.core.widget.NestedScrollView android:id="@+id/cierre_scroll"
+        android:layout_width="0dp" android:layout_height="0dp" android:fillViewport="true" android:clipToPadding="false"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/cierre_save"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp" android:paddingBottom="12dp">
+            <com.google.android.material.textfield.TextInputLayout style="@style/Cierre.EmployeeSelect"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/cierre_employee"
+                app:endIconMode="dropdown_menu" app:expandedHintEnabled="false" app:hintAnimationEnabled="false">
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/cierre_employee" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
+                    android:inputType="none" android:textSize="16sp" android:textColor="@color/ink" android:saveEnabled="false"
+                    android:fontFamily="sans-serif" android:gravity="center_vertical"
+                    android:paddingStart="16dp" android:paddingEnd="16dp" android:paddingVertical="16dp"
+                    android:maxLines="1" android:ellipsize="end" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <TextView android:id="@+id/cierre_employee_notice" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" android:text="@string/cierre_no_employees" android:textAppearance="@style/Cierre.Caption" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="horizontal" android:baselineAligned="false">
+                <com.google.android.material.card.MaterialCardView style="@style/Cierre.Card" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/cierre_count" android:textAppearance="@style/Cierre.Caption" />
+                        <TextView android:id="@+id/cierre_count" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="0" android:textAppearance="@style/Cierre.Figure" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.card.MaterialCardView style="@style/Cierre.Card" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:layout_marginStart="8dp">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/cierre_expected" android:textAppearance="@style/Cierre.Caption" />
+                        <TextView android:id="@+id/cierre_expected" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="$0.00" android:textAppearance="@style/Cierre.Figure" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+            <com.google.android.material.textfield.TextInputLayout android:id="@+id/cierre_delivered_layout" style="@style/Cierre.Input"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/cierre_delivered" app:prefixText="$">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/cierre_delivered"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp" android:inputType="numberDecimal" android:maxLength="12" android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.card.MaterialCardView android:id="@+id/cierre_difference_card" style="@style/Cierre.Card"
+                android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:minHeight="168dp" android:layout_marginTop="12dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:gravity="center" android:padding="16dp">
+                    <TextView android:id="@+id/cierre_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="@string/cierre_difference" android:textAppearance="@style/Cierre.Label" android:accessibilityLiveRegion="polite" />
+                    <TextView android:id="@+id/cierre_difference" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="—" android:textAppearance="@style/Cierre.Figure" android:textSize="40sp" />
+                    <TextView android:id="@+id/cierre_difference_hint" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:text="@string/cierre_hint" android:textAppearance="@style/Cierre.Caption" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <com.google.android.material.button.MaterialButton android:id="@+id/cierre_save" style="@style/Orilla.Button"
+        android:layout_width="0dp" android:layout_height="wrap_content" android:minHeight="52dp" android:layout_margin="16dp"
+        android:text="@string/cierre_save" android:enabled="false" app:cornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

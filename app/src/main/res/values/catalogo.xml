@@ -1,0 +1,34 @@
+<resources>
+    <string name="catalogo_title">Catálogo de servicios</string>
+    <string name="catalogo_add">Agregar servicio</string>
+    <string name="catalogo_new">Nuevo servicio</string>
+    <string name="catalogo_edit_title">Editar servicio</string>
+    <string name="catalogo_edit">Editar</string>
+    <string name="catalogo_edit_service">Editar %1$s</string>
+    <string name="catalogo_empty">Aún no hay servicios</string>
+    <string name="catalogo_empty_hint">Agrega tu primer servicio y define su precio.</string>
+    <string name="catalogo_vehicle">Vehículo</string>
+    <string name="catalogo_car">Carro</string>
+    <string name="catalogo_motorcycle">Moto</string>
+    <string name="catalogo_name">Nombre del servicio</string>
+    <string name="catalogo_price">Precio</string>
+    <string name="catalogo_cancel">Cancelar</string>
+    <string name="catalogo_save">Guardar</string>
+    <string name="catalogo_active">Activo</string>
+    <string name="catalogo_inactive">Inactivo</string>
+    <string name="catalogo_toggle">Servicio activo: %1$s</string>
+    <string name="catalogo_name_required">Ingresa el nombre del servicio.</string>
+    <string name="catalogo_invalid_price">Ingresa un precio mayor que cero, hasta 999999.99 y con hasta 2 decimales.</string>
+    <string name="catalogo_saved">Servicio guardado</string>
+    <string name="catalogo_read_error">No se pudo leer el catálogo guardado.</string>
+    <string name="catalogo_write_error">No se pudo guardar. Intenta de nuevo.</string>
+    <string name="catalogo_missing">El servicio ya no está disponible.</string>
+    <style name="Catalogo.VehicleChip" parent="Widget.Material3.Chip.Filter">
+        <item name="android:textColor">@color/catalogo_chip_text</item>
+        <item name="chipBackgroundColor">@color/catalogo_chip_background</item>
+        <item name="chipStrokeColor">@color/line</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">8dp</item>
+        <item name="ensureMinTouchTargetSize">true</item>
+    </style>
+</resources>

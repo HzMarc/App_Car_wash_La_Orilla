@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:paddingHorizontal="24dp" android:paddingTop="12dp" android:paddingBottom="12dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/catalogo_vehicle" android:textAppearance="@style/Cierre.Label" />
+        <com.google.android.material.chip.ChipGroup android:id="@+id/service_vehicle_group"
+            android:layout_width="match_parent" android:layout_height="wrap_content" app:singleSelection="true" app:selectionRequired="true" app:chipSpacingHorizontal="8dp">
+            <com.google.android.material.chip.Chip android:id="@+id/service_car" style="@style/Catalogo.VehicleChip"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:checkable="true" android:checked="true" android:text="@string/catalogo_car" />
+            <com.google.android.material.chip.Chip android:id="@+id/service_motorcycle" style="@style/Catalogo.VehicleChip"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:checkable="true" android:text="@string/catalogo_motorcycle" />
+        </com.google.android.material.chip.ChipGroup>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/service_name_layout" style="@style/Cierre.Input"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/catalogo_name">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/service_name_input"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
+                android:inputType="textCapSentences" android:maxLength="80" android:maxLines="1" android:imeOptions="actionNext" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/service_price_layout" style="@style/Cierre.Input"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="@string/catalogo_price" app:prefixText="$">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/service_price_input"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
+                android:inputType="numberDecimal" android:maxLength="9" android:imeOptions="actionDone" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

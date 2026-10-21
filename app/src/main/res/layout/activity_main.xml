@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/principal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_bg">
+
+    <FrameLayout
+        android:id="@+id/contenedor_fragmento"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/barra_navegacion_inferior"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/barra_navegacion_inferior"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:background="@color/white"
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nav_inicio"
+            style="@style/Orilla.BottomNavItem"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/nav_inicio" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nav_registrar"
+            style="@style/Orilla.BottomNavItem"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/nav_registrar" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nav_servicios"
+            style="@style/Orilla.BottomNavItem"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/nav_servicios" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nav_cierre"
+            style="@style/Orilla.BottomNavItem"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/nav_cierre" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nav_catalogo"
+            style="@style/Orilla.BottomNavItem"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/nav_catalogo" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nav_empleados"
+            style="@style/Orilla.BottomNavItem"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/empleados_title" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

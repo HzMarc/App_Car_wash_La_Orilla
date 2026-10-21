@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Carwash La Orilla</string>
+    <string name="logo_description">Logo de Carwash La Orilla</string>
+    <color name="logo_background">#000000</color>
+    <string name="open_cierre">Cierre e historial</string>
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_registrar">Registrar</string>
+    <string name="nav_servicios">Servicios</string>
+    <string name="nav_cierre">Cierre</string>
+    <string name="nav_catalogo">Catálogo</string>
+    <string name="nav_menu">Menú</string>
+    <string name="ejemplos_error">No se pudieron cargar todos los datos de ejemplo.</string>
+    <string name="registrar_sin_servicios">No hay servicios activos para este vehículo</string>
+    <string name="registrar_sin_empleados">No hay empleados activos</string>
+    <string name="registrar_catalogos_error">No se pudieron leer los servicios o empleados guardados.</string>
+    <string name="atenciones_error">No se pudieron leer las atenciones guardadas.</string>
+    <string name="atencion_guardar_error">No se pudo guardar. Revisa que el servicio y el empleado estén activos y que su caja no esté cerrada.</string>
+    <string name="atencion_cambio_error">No se pudo cambiar la atención. Puede estar anulada o pertenecer a una caja cerrada.</string>
+    <string name="atencion_precio">Precio cobrado</string>
+    <string name="atencion_anulada">Anulada</string>
+    <string name="atencion_ejemplo">Ejemplo</string>
+    <string name="inicio_sin_atenciones">Aún no hay atenciones registradas hoy.</string>
+</resources>

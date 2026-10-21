@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cierre.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp">
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="80dp" android:padding="16dp">
+        <TextView android:id="@+id/service_vehicle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:paddingHorizontal="8dp" android:paddingVertical="4dp" android:textAppearance="@style/Cierre.Caption" tools:text="Carro"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent" />
+        <TextView android:id="@+id/service_name" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:layout_marginEnd="8dp" android:textSize="14sp" android:textColor="@color/ink"
+            android:maxLines="1" android:ellipsize="end" tools:text="Lavado completo"
+            app:layout_constraintTop_toBottomOf="@id/service_vehicle" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toStartOf="@id/service_price" />
+        <TextView android:id="@+id/service_price" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textAppearance="@style/Cierre.Figure" android:maxWidth="160dp" android:maxLines="1"
+            app:autoSizeTextType="uniform" app:autoSizeMinTextSize="16sp" app:autoSizeMaxTextSize="22sp" app:autoSizeStepGranularity="1sp" tools:text="$5.00"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+        <androidx.constraintlayout.widget.Barrier android:id="@+id/service_content_bottom" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            app:barrierDirection="bottom" app:constraint_referenced_ids="service_name,service_price" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/service_edit" style="@style/Orilla.Button.Outlined"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp"
+            android:layout_marginTop="8dp" android:text="@string/catalogo_edit" android:textColor="@color/ink"
+            app:layout_constraintTop_toBottomOf="@id/service_content_bottom" app:layout_constraintStart_toStartOf="parent" app:layout_constraintBottom_toBottomOf="parent" />
+        <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/service_active"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp"
+            android:text="@string/catalogo_active" android:textAppearance="@style/Cierre.Caption" app:thumbTint="@color/ink"
+            app:trackTint="@color/catalogo_switch_track" app:layout_constraintTop_toTopOf="@id/service_edit"
+            app:layout_constraintBottom_toBottomOf="@id/service_edit" app:layout_constraintEnd_toEndOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

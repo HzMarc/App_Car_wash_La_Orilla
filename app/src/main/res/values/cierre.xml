@@ -1,0 +1,80 @@
+<resources>
+    <color name="ink">@color/app_black</color>
+    <color name="gold">@color/app_yellow</color>
+    <color name="bg">@color/app_bg</color>
+    <color name="line">@color/app_border</color>
+    <color name="ink_secondary">@color/app_text_secondary</color>
+    <style name="Theme.Orilla.Cierre" parent="Theme.Car_wash_La_Orilla">
+        <item name="colorError">@color/ink</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:fontFamily">sans</item>
+    </style>
+    <style name="Cierre.Label" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Cierre.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textColor">@color/ink_secondary</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="Cierre.Figure" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textSize">32sp</item>
+        <item name="android:fontFamily">sans-serif-condensed</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Cierre.Card" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardBackgroundColor">@color/app_card_bg</item>
+        <item name="cardCornerRadius">10dp</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/line</item>
+        <item name="strokeWidth">1.5dp</item>
+    </style>
+    <style name="Cierre.Input" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+        <item name="boxStrokeColor">@color/ink</item>
+        <item name="boxBackgroundColor">@color/app_card_bg</item>
+    </style>
+    <style name="Cierre.EmployeeSelect" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="boxCornerRadiusTopStart">10dp</item>
+        <item name="boxCornerRadiusTopEnd">10dp</item>
+        <item name="boxCornerRadiusBottomStart">10dp</item>
+        <item name="boxCornerRadiusBottomEnd">10dp</item>
+        <item name="boxStrokeColor">@color/app_black</item>
+        <item name="boxBackgroundColor">@color/app_card_bg</item>
+    </style>
+    <string name="cierre_title">Cierre diario</string>
+    <string name="cierre_today">Cierre de hoy</string>
+    <string name="cierre_history">Historial</string>
+    <string name="cierre_employee">Empleado</string>
+    <string name="cierre_select">Seleccionar empleado</string>
+    <string name="cierre_no_employees">Aún no hay empleados disponibles para realizar un cierre.</string>
+    <string name="cierre_count">Atenciones</string>
+    <string name="cierre_expected">Esperado</string>
+    <string name="cierre_delivered">Efectivo entregado</string>
+    <string name="cierre_difference">DIFERENCIA</string>
+    <string name="cierre_balanced">✓ CAJA CUADRADA</string>
+    <string name="cierre_short">↓ FALTANTE</string>
+    <string name="cierre_over">↑ SOBRANTE</string>
+    <string name="cierre_hint">Ingresa el efectivo que entrega el empleado para compararlo con lo esperado.</string>
+    <string name="cierre_save">Guardar cierre</string>
+    <string name="cierre_empty_history">Aún no hay cierres guardados</string>
+    <string name="cierre_empty_history_hint">Los cierres que guardes aparecerán aquí.</string>
+    <string name="cierre_invalid_amount">Ingresa un monto válido con hasta 2 decimales.</string>
+    <string name="cierre_saved">Cierre guardado</string>
+    <string name="cierre_save_error">No se pudo guardar el cierre. Intenta de nuevo.</string>
+    <string name="cierre_invalid_summary">No se pudieron cargar los totales de empleados.</string>
+    <string name="cierre_totales_actualizados">Los totales cambiaron. Revisa los importes antes de guardar el cierre.</string>
+    <string name="cierre_incluye_ejemplos">Este total incluye atenciones de ejemplo.</string>
+    <string name="cierre_already_saved">Cierre ya guardado</string>
+    <string name="cierre_history_error">No se pudo leer el historial guardado.</string>
+    <string name="cierre_history_detail">Esperado %1$s · Entregado %2$s</string>
+    <string name="cierre_history_detail_legacy">Esperado %1$s · Contado %2$s · Entregado %3$s</string>
+    <string name="cierre_history_count">%1$d atenciones · %2$s</string>
+</resources>

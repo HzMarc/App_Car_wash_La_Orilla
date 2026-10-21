@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="wrap_content" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical"
+        android:paddingHorizontal="24dp" android:paddingTop="12dp" android:paddingBottom="12dp">
+        <com.google.android.material.textfield.TextInputLayout android:id="@+id/empleado_nombre_layout" style="@style/Cierre.Input"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/empleados_name">
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/empleado_nombre_input"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="56dp"
+                android:inputType="textCapWords" android:maxLength="80" android:maxLines="1" android:imeOptions="actionDone" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"
+            android:gravity="center_vertical" android:layout_marginTop="12dp">
+            <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:text="@string/empleados_status" android:textAppearance="@style/Cierre.Label" />
+            <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/empleado_estado_input"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp"
+                android:text="@string/empleados_active" android:checked="true" android:textAppearance="@style/Cierre.Caption"
+                app:thumbTint="@color/ink" app:trackTint="@color/catalogo_switch_track" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

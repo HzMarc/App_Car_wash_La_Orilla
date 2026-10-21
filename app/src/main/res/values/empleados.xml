@@ -1,0 +1,29 @@
+<resources>
+    <string name="empleados_title">Empleados</string>
+    <string name="empleados_back">Regresar</string>
+    <string name="empleados_search">Buscar empleado</string>
+    <string name="empleados_add">Agregar empleado</string>
+    <string name="empleados_edit">Editar empleado</string>
+    <string name="empleados_name">Nombre</string>
+    <string name="empleados_status">Estado</string>
+    <string name="empleados_active">Activo</string>
+    <string name="empleados_inactive">Inactivo</string>
+    <string name="empleados_cancel">Cancelar</string>
+    <string name="empleados_save">Guardar</string>
+    <string name="empleados_empty">Aún no hay empleados</string>
+    <string name="empleados_no_results">Sin resultados</string>
+    <string name="empleados_name_required">Ingresa el nombre del empleado.</string>
+    <string name="empleados_saved">Empleado guardado</string>
+    <string name="empleados_read_error">No se pudieron leer los empleados guardados.</string>
+    <string name="empleados_write_error">No se pudo guardar. Intenta de nuevo.</string>
+    <string name="empleados_missing">El empleado ya no está disponible.</string>
+    <string name="empleados_toggle">Cambiar estado de %1$s</string>
+    <string name="empleados_history">Historial</string>
+    <string name="empleados_history_description">Ver historial de %1$s</string>
+    <string name="empleados_history_title">Historial de entregas</string>
+    <string name="empleados_history_empty">Este empleado aún no tiene cierres guardados.</string>
+    <string name="empleados_history_error">No se pudo leer el historial de entregas.</string>
+    <string name="empleados_history_delivered">Dinero entregado</string>
+    <string name="empleados_history_total">Total entregado</string>
+    <string name="empleados_history_close">Cerrar</string>
+</resources>

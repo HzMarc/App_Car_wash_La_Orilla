@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Cierre.Card" android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp" android:clickable="true" android:focusable="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+    <androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="48dp">
+        <TextView android:id="@+id/empleado_avatar" android:layout_width="40dp" android:layout_height="40dp"
+            android:gravity="center" android:textSize="20sp" android:textStyle="bold" android:importantForAccessibility="no" tools:text="M"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent" />
+        <TextView android:id="@+id/empleado_nombre" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_marginStart="12dp" android:layout_marginEnd="8dp" android:textSize="16sp" android:textColor="@color/ink"
+            android:maxLines="1" android:ellipsize="end" tools:text="Marcos Henríquez"
+            app:layout_constraintStart_toEndOf="@id/empleado_avatar" app:layout_constraintEnd_toStartOf="@id/empleado_activo"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toTopOf="@id/empleado_estado" app:layout_constraintVertical_chainStyle="packed" />
+        <TextView android:id="@+id/empleado_estado" android:layout_width="0dp" android:layout_height="wrap_content"
+            android:layout_marginStart="12dp" android:layout_marginEnd="8dp" android:textAppearance="@style/Cierre.Caption" tools:text="Activo"
+            app:layout_constraintStart_toEndOf="@id/empleado_avatar" app:layout_constraintEnd_toStartOf="@id/empleado_activo"
+            app:layout_constraintTop_toBottomOf="@id/empleado_nombre" app:layout_constraintBottom_toBottomOf="parent" />
+        <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/empleado_activo"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp" android:minWidth="48dp"
+            app:thumbTint="@color/ink" app:trackTint="@color/catalogo_switch_track"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent" app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.button.MaterialButton android:id="@+id/empleado_historial" style="@style/Orilla.Button.Outlined"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:minHeight="48dp"
+            android:text="@string/empleados_history"
+             />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

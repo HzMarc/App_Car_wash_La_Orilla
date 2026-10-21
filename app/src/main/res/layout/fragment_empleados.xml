@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/bg">
+    <TextView android:id="@+id/empleados_toolbar"
+        android:layout_width="0dp" android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp" android:layout_marginTop="24dp"
+        android:text="@string/empleados_title" android:textAppearance="@style/Orilla.ScreenTitle"
+        app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+    <androidx.appcompat.widget.SearchView android:id="@+id/empleados_search"
+        android:layout_width="0dp" android:layout_height="wrap_content" android:minHeight="56dp"
+        android:layout_marginHorizontal="16dp" android:layout_marginTop="16dp" android:background="@drawable/empleados_search_background"
+        app:queryHint="@string/empleados_search" app:iconifiedByDefault="false" app:queryBackground="@null" app:submitBackground="@null"
+        app:layout_constraintTop_toBottomOf="@id/empleados_toolbar" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+    <FrameLayout android:layout_width="0dp" android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/empleados_search" app:layout_constraintBottom_toTopOf="@id/empleados_add"
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/empleados_list"
+            android:layout_width="match_parent" android:layout_height="match_parent" android:paddingHorizontal="16dp" android:paddingVertical="12dp"
+            android:clipToPadding="false" android:overScrollMode="never" tools:listitem="@layout/item_empleado" />
+        <TextView android:id="@+id/empleados_empty" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:gravity="center" android:padding="24dp" android:text="@string/empleados_empty" android:textAppearance="@style/Cierre.Label" />
+    </FrameLayout>
+    <com.google.android.material.button.MaterialButton android:id="@+id/empleados_add" style="@style/Orilla.Button.Add"
+        android:layout_width="0dp" android:layout_height="wrap_content" android:minHeight="52dp" android:layout_margin="16dp"
+        android:text="@string/empleados_add" app:icon="@drawable/ic_add_service" app:iconGravity="textStart"
+        app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

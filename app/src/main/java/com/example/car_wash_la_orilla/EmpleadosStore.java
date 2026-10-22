@@ -20,12 +20,18 @@ final class EmpleadosStore {
     }
 
     static final class Empleado {
-        final String id, nombre;
+        final String id, nombre, user, password;
         final boolean activo;
         Empleado(String id, String nombre, boolean activo) {
+            this(id, nombre, activo, "");
+        }
+
+        Empleado(String id, String nombre, boolean activo, String password) {
             this.id = id;
             this.nombre = nombre;
             this.activo = activo;
+            this.user = nombre;
+            this.password = password;
         }
     }
 
@@ -36,13 +42,22 @@ final class EmpleadosStore {
             JSONObject row = data.getJSONObject(i);
             String id = row.getString("id"), name = row.getString("nombre");
             if (id.trim().isEmpty() || name.trim().isEmpty()) throw new JSONException("Invalid employee");
-            employees.add(new Empleado(id, name, row.getBoolean("activo")));
+            employees.add(new Empleado(id, name, row.getBoolean("activo"), row.optString("password", "")));
         }
         return employees;
     }
 
     Empleado find(String id) throws JSONException {
         for (Empleado employee : getAll()) if (employee.id.equals(id)) return employee;
+        return null;
+    }
+
+    Empleado autenticar(String user, String password) throws JSONException {
+        if (user.trim().isEmpty()) return null;
+        for (Empleado employee : getAll()) {
+            if (employee.activo && employee.user.equalsIgnoreCase(user.trim())
+                    && employee.password.equals(password)) return employee;
+        }
         return null;
     }
 
@@ -55,7 +70,7 @@ final class EmpleadosStore {
         } else {
             int index = indexOf(employees, id);
             if (index < 0) return false;
-            employees.set(index, new Empleado(id, normalized, active));
+            employees.set(index, new Empleado(id, normalized, active, employees.get(index).password));
         }
         return write(employees);
     }
@@ -65,7 +80,7 @@ final class EmpleadosStore {
         int index = indexOf(employees, id);
         if (index < 0) return false;
         Empleado employee = employees.get(index);
-        employees.set(index, new Empleado(employee.id, employee.nombre, active));
+        employees.set(index, new Empleado(employee.id, employee.nombre, active, employee.password));
         return write(employees);
     }
 
@@ -81,6 +96,8 @@ final class EmpleadosStore {
             row.put("id", employee.id);
             row.put("nombre", employee.nombre);
             row.put("activo", employee.activo);
+            row.put("user", employee.user);
+            row.put("password", employee.password);
             data.put(row);
         }
         return preferences.edit().putString("empleados", data.toString()).commit();

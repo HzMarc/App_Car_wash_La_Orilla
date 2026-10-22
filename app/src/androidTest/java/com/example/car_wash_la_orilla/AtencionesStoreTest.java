@@ -125,6 +125,56 @@ public class AtencionesStoreTest {
         catch (JSONException expected) { assertEquals("datos dañados", preferencias.getString("registros", "")); }
     }
 
+    @Test public void loginValidaCredencialesYEstadoSinPerderPasswordAlEditar() throws Exception {
+        EmpleadosStore empleados = new EmpleadosStore(context);
+        assertNotNull(empleados.autenticar(" empleado uno ", ""));
+        assertNull(empleados.autenticar("", ""));
+        assertNull(empleados.autenticar("Desconocido", ""));
+        assertNull(empleados.autenticar("Empleado Uno", "incorrecta"));
+        SharedPreferences prefs = context.getSharedPreferences("empleados", 0);
+        JSONArray rows = new JSONArray(prefs.getString("empleados", "[]"));
+        rows.getJSONObject(0).put("password", "Clave de prueba");
+        assertTrue(prefs.edit().putString("empleados", rows.toString()).commit());
+        assertTrue(empleados.save(empleado, "Nombre Nuevo", true));
+        assertNull(empleados.autenticar("Nombre Nuevo", ""));
+        assertNotNull(empleados.autenticar("Nombre Nuevo", "Clave de prueba"));
+        assertTrue(empleados.setActive(empleado, false));
+        assertNull(empleados.autenticar("Nombre Nuevo", "Clave de prueba"));
+        assertTrue(empleados.setActive(empleado, true));
+        assertNotNull(empleados.autenticar("Nombre Nuevo", "Clave de prueba"));
+    }
+
+    @Test public void agregaCredencialesAEjemplosYDatosExistentesSinDuplicar() throws Exception {
+        assertTrue(DatosEjemplo.cargar(context));
+        EmpleadosStore empleados = new EmpleadosStore(context);
+        int cantidad = empleados.getAll().size();
+        String[] nombres = {"Carlos Mendoza", "Ana Gómez", "Luis Rodríguez", "Mariana Torres", "José Hernández"};
+        String[] passwords = {"carlos123", "ana123", "luis123", "mariana123", "jose123"};
+        for (int i = 0; i < nombres.length; i++) {
+            assertNotNull(empleados.autenticar(nombres[i], passwords[i]));
+            assertNull(empleados.autenticar(nombres[i], ""));
+        }
+        SharedPreferences prefs = context.getSharedPreferences("empleados", 0);
+        JSONArray rows = new JSONArray(prefs.getString("empleados", "[]"));
+        rows.getJSONObject(0).put("password", "Conservar");
+        rows.getJSONObject(1).remove("user");
+        rows.getJSONObject(1).remove("password");
+        for (int i = 0; i < rows.length(); i++) {
+            if ("Carlos Mendoza".equals(rows.getJSONObject(i).getString("nombre"))) {
+                rows.getJSONObject(i).put("password", "");
+            }
+        }
+        assertTrue(prefs.edit().putString("empleados", rows.toString()).commit());
+        assertTrue(DatosEjemplo.cargar(context));
+        assertEquals(cantidad, empleados.getAll().size());
+        rows = new JSONArray(prefs.getString("empleados", "[]"));
+        assertEquals("Conservar", rows.getJSONObject(0).getString("password"));
+        assertEquals("Empleado Dos", rows.getJSONObject(1).getString("user"));
+        assertEquals("", rows.getJSONObject(1).getString("password"));
+        assertNotNull(empleados.autenticar("Carlos Mendoza", "carlos123"));
+        assertNull(empleados.autenticar("Carlos Mendoza", ""));
+    }
+
     @Test public void migraEjemplosUnaVezConTotalesConsistentes() throws Exception {
         assertTrue(DatosEjemplo.cargar(context));
         assertTrue(CatalogoInicial.cargar(context));

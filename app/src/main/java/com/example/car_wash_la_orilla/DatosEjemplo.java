@@ -15,6 +15,9 @@ final class DatosEjemplo {
     private static final String[] NOMBRES = {
             "Carlos Mendoza", "Ana Gómez", "Luis Rodríguez", "Mariana Torres", "José Hernández"
     };
+    private static final String[] PASSWORDS = {
+            "carlos123", "ana123", "luis123", "mariana123", "jose123"
+    };
 
     private DatosEjemplo() { }
 
@@ -22,22 +25,40 @@ final class DatosEjemplo {
         try {
             SharedPreferences empleados = context.getSharedPreferences("empleados", Context.MODE_PRIVATE);
             JSONArray lista = new JSONArray(empleados.getString("empleados", "[]"));
+            boolean actualizado = false;
+            for (int j = 0; j < lista.length(); j++) {
+                JSONObject empleado = lista.getJSONObject(j);
+                String nombre = empleado.getString("nombre");
+                if (!nombre.equals(empleado.optString("user"))) {
+                    empleado.put("user", nombre);
+                    actualizado = true;
+                }
+                if (!empleado.has("password")) {
+                    empleado.put("password", "");
+                    actualizado = true;
+                }
+            }
             String[] ids = new String[NOMBRES.length];
             for (int i = 0; i < NOMBRES.length; i++) {
                 for (int j = 0; j < lista.length(); j++) {
                     JSONObject empleado = lista.getJSONObject(j);
                     if (NOMBRES[i].equalsIgnoreCase(empleado.getString("nombre").trim())) {
                         ids[i] = empleado.getString("id");
+                        if (empleado.optString("password", "").isEmpty()) {
+                            empleado.put("password", PASSWORDS[i]);
+                            actualizado = true;
+                        }
                         break;
                     }
                 }
                 if (ids[i] == null && !empleados.getBoolean(MARCA, false)) {
                     ids[i] = "ejemplo-empleado-" + (i + 1);
                     lista.put(new JSONObject().put("id", ids[i])
-                            .put("nombre", NOMBRES[i]).put("activo", true));
+                            .put("nombre", NOMBRES[i]).put("activo", true)
+                            .put("user", NOMBRES[i]).put("password", PASSWORDS[i]));
                 }
             }
-            if (!empleados.getBoolean(MARCA, false)
+            if ((!empleados.getBoolean(MARCA, false) || actualizado)
                     && !empleados.edit().putString("empleados", lista.toString())
                     .putBoolean(MARCA, true).commit()) return false;
 

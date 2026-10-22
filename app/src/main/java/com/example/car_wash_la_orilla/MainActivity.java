@@ -20,11 +20,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView textoNavServicios;
     private TextView textoNavCierre;
     private TextView textoNavCatalogo;
-    private TextView textoNavEmpleados;
+    private TextView textoNavPerfil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (SesionStore.requerir(this) == null) return;
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
         boolean catalogoCargado = CatalogoInicial.cargar(this);
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         textoNavServicios = findViewById(R.id.nav_servicios);
         textoNavCierre = findViewById(R.id.nav_cierre);
         textoNavCatalogo = findViewById(R.id.nav_catalogo);
-        textoNavEmpleados = findViewById(R.id.nav_empleados);
+        textoNavPerfil = findViewById(R.id.nav_perfil);
 
         if (savedInstanceState == null) {
             mostrarInicio();
@@ -63,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
                 resaltarPestana(textoNavCierre);
             } else if (fragmento instanceof CatalogoFragment) {
                 resaltarPestana(textoNavCatalogo);
-            } else if (fragmento instanceof EmpleadosFragment) {
-                resaltarPestana(textoNavEmpleados);
+            } else if (fragmento instanceof PerfilFragment) {
+                resaltarPestana(textoNavPerfil);
             } else {
                 resaltarPestana(textoNavInicio);
             }
@@ -75,7 +76,12 @@ public class MainActivity extends AppCompatActivity {
         textoNavServicios.setOnClickListener(v -> mostrarServicios());
         textoNavCierre.setOnClickListener(v -> mostrarCierre());
         textoNavCatalogo.setOnClickListener(v -> mostrarCatalogo());
-        textoNavEmpleados.setOnClickListener(v -> mostrarEmpleados());
+        textoNavPerfil.setOnClickListener(v -> mostrarPerfil());
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        if (!isFinishing()) SesionStore.requerir(this);
     }
 
     public void mostrarCierre() {
@@ -88,9 +94,9 @@ public class MainActivity extends AppCompatActivity {
         resaltarPestana(textoNavCatalogo);
     }
 
-    public void mostrarEmpleados() {
-        cargarFragmento(new EmpleadosFragment());
-        resaltarPestana(textoNavEmpleados);
+    public void mostrarPerfil() {
+        cargarFragmento(new PerfilFragment());
+        resaltarPestana(textoNavPerfil);
     }
 
     public void mostrarInicio() {
@@ -121,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
         restablecerPestana(textoNavServicios);
         restablecerPestana(textoNavCierre);
         restablecerPestana(textoNavCatalogo);
-        restablecerPestana(textoNavEmpleados);
+        restablecerPestana(textoNavPerfil);
 
         pestanaSeleccionada.setTextColor(ContextCompat.getColor(this, R.color.app_black));
         pestanaSeleccionada.setTypeface(pestanaSeleccionada.getTypeface(), Typeface.BOLD);

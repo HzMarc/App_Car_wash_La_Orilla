@@ -1,0 +1,9 @@
+<resources>
+    <string name="perfil_title">Perfil</string>
+    <string name="perfil_nombre">Nombre del empleado</string>
+    <string name="perfil_user">Usuario</string>
+    <string name="registrar_empleado_actual">Empleado: %1$s</string>
+    <string name="perfil_qr_title">QR para transferencias</string>
+    <string name="perfil_qr_hint">QR estático de demostración del negocio. No permite pagos reales. Tócalo para ampliarlo.</string>
+    <string name="perfil_qr_cerrar">Cerrar</string>
+</resources>

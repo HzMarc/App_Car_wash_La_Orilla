@@ -21,6 +21,19 @@
             android:text="Registrar servicio"
             android:textAppearance="@style/Orilla.ScreenTitle" />
 
+        <TextView android:id="@+id/registrar_empleado"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" android:textAppearance="@style/Cierre.Label" />
+
+        <LinearLayout android:id="@+id/registrar_aviso_caja" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="12dp" android:orientation="vertical">
+            <TextView android:id="@+id/registrar_aviso_texto" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:text="@string/caja_falta_apertura" android:textAppearance="@style/Cierre.Label" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/registrar_ir_inicio"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp"
+                android:text="@string/caja_ir_inicio" />
+        </LinearLayout>
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/registrar_vehiculo_tabs"
             style="@style/Orilla.SectionTabs"

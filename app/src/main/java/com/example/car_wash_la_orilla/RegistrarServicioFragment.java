@@ -42,6 +42,7 @@ public class RegistrarServicioFragment extends Fragment {
     private String[] preciosMoto = {};
     private String[] idsCarro = {}, idsMoto = {};
     private MaterialButton botonGuardarAtencion;
+    private boolean cajaAbierta;
 
     private void cargarCatalogos() {
         java.util.List<String> nombresCarro = new java.util.ArrayList<>();
@@ -125,6 +126,9 @@ public class RegistrarServicioFragment extends Fragment {
             botonGuardarAtencion.setOnClickListener(v -> mostrarDialogoConfirmacionGuardado());
         }
 
+        vista.findViewById(R.id.registrar_ir_inicio).setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) ((MainActivity) getActivity()).mostrarInicio();
+        });
         cargarCatalogos();
         TabLayout.Tab seleccionada = vehiculos.getTabAt(esCarroSeleccionado ? 0 : 1);
         if (seleccionada != null) seleccionada.select();
@@ -216,7 +220,7 @@ public class RegistrarServicioFragment extends Fragment {
 
     private void actualizarMostrarPrecio() {
         String[] precios = esCarroSeleccionado ? preciosCarro : preciosMoto;
-        botonGuardarAtencion.setEnabled(precios.length > 0);
+        botonGuardarAtencion.setEnabled(precios.length > 0 && cajaAbierta);
         if (precios.length == 0) {
             textoPrecioTotal.setText(R.string.registrar_sin_servicios);
             return;
@@ -279,6 +283,7 @@ public class RegistrarServicioFragment extends Fragment {
     }
 
     private void mostrarDialogoConfirmacionGuardado() {
+        if (!actualizarEstadoCaja()) return;
         String[] servicios = esCarroSeleccionado ? serviciosCarro : serviciosMoto;
         if (servicios.length == 0) return;
 
@@ -300,8 +305,8 @@ public class RegistrarServicioFragment extends Fragment {
         String precio = precios[indiceServicioSeleccionado];
         String servicioId = (esCarroSeleccionado ? idsCarro : idsMoto)[indiceServicioSeleccionado];
 
-        String empleadoId = primerEmpleadoActivoId();
-        if (empleadoId == null) {
+        EmpleadosStore.Empleado empleado = SesionStore.requerir(requireActivity());
+        if (empleado == null) {
             Toast.makeText(requireContext(), R.string.registrar_sin_empleados, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -320,7 +325,7 @@ public class RegistrarServicioFragment extends Fragment {
 
         textoDialogoVehiculo.setText("• Vehículo: " + vehiculo);
         textoDialogoServicio.setText("• Servicio: " + servicio);
-        textoDialogoCliente.setText("• Encargado: " + cliente);
+        textoDialogoCliente.setText("• Encargado: " + cliente + "\n• Empleado: " + empleado.nombre);
         if (textoDialogoMetodoPago != null) {
             if (metodoPagoSeleccionado.equalsIgnoreCase("Efectivo") && campoMontoRecibido != null
                     && campoMontoRecibido.getText() != null && !campoMontoRecibido.getText().toString().trim().isEmpty()) {
@@ -344,9 +349,11 @@ public class RegistrarServicioFragment extends Fragment {
         botonDialogoCancelar.setOnClickListener(v -> dialogo.dismiss());
 
         botonDialogoGuardar.setOnClickListener(v -> {
+            if (SesionStore.requerir(requireActivity()) == null) return;
+            if (!actualizarEstadoCaja()) { dialogo.dismiss(); return; }
             botonDialogoGuardar.setEnabled(false);
             try {
-                if (!new AtencionesStore(requireContext()).registrar(servicioId, empleadoId, cliente, metodoPagoSeleccionado, precioConfirmado)) {
+                if (!new AtencionesStore(requireContext()).registrarActual(servicioId, cliente, metodoPagoSeleccionado, precioConfirmado)) {
                     throw new IllegalStateException();
                 }
             } catch (org.json.JSONException | IllegalStateException error) {
@@ -364,16 +371,29 @@ public class RegistrarServicioFragment extends Fragment {
         dialogo.show();
     }
 
-    private String primerEmpleadoActivoId() {
-        try {
-            for (EmpleadosStore.Empleado empleado : new EmpleadosStore(requireContext()).getAll()) {
-                if (empleado.activo) {
-                    return empleado.id;
-                }
-            }
-        } catch (org.json.JSONException ignored) {
+    @Override public void onResume() {
+        super.onResume();
+        EmpleadosStore.Empleado empleado = SesionStore.requerir(requireActivity());
+        actualizarEstadoCaja();
+        if (empleado != null && getView() != null)
+            ((TextView) requireView().findViewById(R.id.registrar_empleado)).setText(
+                    getString(R.string.registrar_empleado_actual, empleado.nombre));
+    }
+
+    private boolean actualizarEstadoCaja() {
+        if (getView() == null || SesionStore.requerir(requireActivity()) == null) return false;
+        String estado = "sin_abrir";
+        try { estado = new CierresStore(requireContext()).resumenActual(java.time.LocalDate.now()).getString("estado"); }
+        catch (org.json.JSONException | RuntimeException error) {
+            Toast.makeText(requireContext(), R.string.atenciones_error, Toast.LENGTH_LONG).show();
         }
-        return null;
+        cajaAbierta = "abierta".equals(estado);
+        requireView().findViewById(R.id.registrar_aviso_caja).setVisibility(cajaAbierta ? View.GONE : View.VISIBLE);
+        ((TextView) requireView().findViewById(R.id.registrar_aviso_texto)).setText(
+                "cerrada".equals(estado) ? R.string.caja_cerrada : R.string.caja_falta_apertura);
+        String[] precios = esCarroSeleccionado ? preciosCarro : preciosMoto;
+        botonGuardarAtencion.setEnabled(cajaAbierta && precios.length > 0);
+        return cajaAbierta;
     }
 
     private int dpAPx(float dp) {

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true"
+    android:background="@color/app_bg">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="24dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/perfil_title" android:textAppearance="@style/Orilla.ScreenTitle" />
+        <com.google.android.material.card.MaterialCardView style="@style/Cierre.Card"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="20dp">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/perfil_nombre" android:textAppearance="@style/Cierre.Caption" />
+                <TextView android:id="@+id/perfil_nombre" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp" android:textAppearance="@style/Cierre.Label" android:textSize="22sp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp"
+                    android:text="@string/perfil_user" android:textAppearance="@style/Cierre.Caption" />
+                <TextView android:id="@+id/perfil_user" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp" android:textAppearance="@style/Cierre.Label" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <com.google.android.material.card.MaterialCardView style="@style/Cierre.Card"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="20dp">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/perfil_qr_title" android:textAppearance="@style/Cierre.Label" android:textSize="20sp" />
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" android:text="@string/perfil_qr_hint" android:textAppearance="@style/Cierre.Caption" />
+                <ImageView android:id="@+id/perfil_qr" android:layout_width="match_parent" android:layout_height="280dp"
+                    android:layout_marginTop="16dp" android:background="@color/white" android:padding="16dp"
+                    android:scaleType="fitCenter" android:clickable="true" android:focusable="true"
+                    android:contentDescription="@string/perfil_qr_title" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

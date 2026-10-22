@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/inicio_scroll" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true">
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/app_bg"
     android:paddingStart="16dp"
     android:paddingTop="24dp"
@@ -35,6 +38,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textoTituloApp" />
 
+    <com.google.android.material.card.MaterialCardView android:id="@+id/inicio_caja_card"
+        style="@style/Cierre.Card" android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" app:layout_constraintTop_toBottomOf="@id/textoFecha">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:padding="12dp">
+            <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_marginEnd="8dp">
+                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:text="@string/caja_estado_title" android:textAppearance="@style/Cierre.Caption" />
+                <TextView android:id="@+id/inicio_caja_estado" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:text="@string/caja_sin_abrir" android:textAppearance="@style/Cierre.Label" />
+                <TextView android:id="@+id/inicio_caja_detalle" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:textAppearance="@style/Cierre.Caption" android:visibility="gone" />
+            </LinearLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/inicio_caja_accion"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="48dp"
+                android:text="@string/apertura_title" app:cornerRadius="10dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Fila de Tarjetas de Resumen -->
     <LinearLayout
         android:id="@+id/contenedorResumen"
@@ -42,7 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/textoFecha">
+        app:layout_constraintTop_toBottomOf="@id/inicio_caja_card">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="0dp"
@@ -63,7 +86,14 @@
                 android:padding="12dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="12sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:text="Atenciones "
@@ -101,7 +131,14 @@
                 android:padding="12dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="12sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:text="Carros "
@@ -138,7 +175,14 @@
                 android:padding="12dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:autoSizeTextType="uniform"
+                    android:autoSizeMinTextSize="9sp"
+                    android:autoSizeMaxTextSize="12sp"
+                    android:autoSizeStepGranularity="1sp"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:text="Motos "
@@ -174,14 +218,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="20dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-condensed"
-                android:text="Ingreso esperado "
+                android:text="@string/cierre_expected"
                 android:textColor="@color/app_black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -212,23 +256,6 @@
         app:cornerRadius="10dp"
         app:layout_constraintTop_toBottomOf="@id/tarjetaIngresoEsperado" />
 
-    <!-- Botón Empleados -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/botonEmpleados"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="match_parent"
-        android:layout_height="52dp"
-        android:layout_marginTop="10dp"
-        android:fontFamily="sans-serif-condensed"
-        android:text="Empleados"
-        android:textColor="@color/app_black"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:cornerRadius="10dp"
-        app:layout_constraintTop_toBottomOf="@id/botonRegistrarServicio"
-        app:strokeColor="@color/app_border"
-        app:strokeWidth="1.5dp" />
-
     <!-- Etiqueta de Últimas Atenciones -->
     <TextView
         android:id="@+id/textoEtiquetaRecientes"
@@ -240,18 +267,18 @@
         android:textColor="@color/app_text_secondary"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/botonEmpleados" />
+        app:layout_constraintTop_toBottomOf="@id/botonRegistrarServicio" />
 
     <!-- Lista de Últimas Atenciones -->
     <LinearLayout
         android:id="@+id/contenedorListaRecientes"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textoEtiquetaRecientes">
 
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

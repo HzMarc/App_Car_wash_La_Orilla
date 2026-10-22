@@ -62,7 +62,9 @@ public class LoginActivity extends AppCompatActivity {
                 passwordLayout.setError(getString(R.string.login_invalid));
                 return;
             }
-            startActivity(new Intent(this, MainActivity.class));
+            if (!new SesionStore(this).iniciar(empleado)) throw new IllegalStateException();
+            startActivity(new Intent(this, MainActivity.class)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             finish();
         } catch (JSONException | IllegalStateException error) {
             Toast.makeText(this, R.string.login_error, Toast.LENGTH_LONG).show();

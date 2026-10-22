@@ -46,6 +46,11 @@ public class AtencionesStoreTest {
         servicio = catalogo.getAll().get(0).id;
         segundoServicio = catalogo.getAll().get(1).id;
         store = new AtencionesStore(context);
+        entrar(empleado);
+        assertTrue(new AperturasStore(context).abrir(LocalDate.now(), java.math.BigDecimal.ZERO));
+        entrar(segundoEmpleado);
+        assertTrue(new AperturasStore(context).abrir(LocalDate.now(), java.math.BigDecimal.ZERO));
+        context.getSharedPreferences("sesion", 0).edit().clear().commit();
     }
 
     @After public void limpiar() {
@@ -77,6 +82,7 @@ public class AtencionesStoreTest {
     }
 
     @Test public void anularExcluyeDelTotalYConservaMotivo() throws Exception {
+        entrar(empleado);
         assertTrue(store.registrar(servicio, empleado, 500));
         String id = store.getAll().get(0).id;
         assertFalse(store.cambiar(id, " ", null));
@@ -90,6 +96,7 @@ public class AtencionesStoreTest {
     }
 
     @Test public void preciosHistoricosYCorreccionesNoDependenDelCatalogo() throws Exception {
+        entrar(empleado);
         assertTrue(store.registrar(servicio, empleado, 500));
         String id = store.getAll().get(0).id;
         assertTrue(new CatalogoStore(context).save(servicio, "Lavado carro nuevo", "carro", 950));
@@ -101,6 +108,7 @@ public class AtencionesStoreTest {
     }
 
     @Test public void cierreBloqueaRegistrosYModificacionesDelEmpleado() throws Exception {
+        entrar(empleado);
         assertTrue(store.registrar(servicio, empleado, 500));
         String id = store.getAll().get(0).id;
         JSONArray cierre = new JSONArray().put(new JSONObject().put("fecha", LocalDate.now().toString()).put("empleadoId", empleado));
@@ -173,6 +181,158 @@ public class AtencionesStoreTest {
         assertEquals("", rows.getJSONObject(1).getString("password"));
         assertNotNull(empleados.autenticar("Carlos Mendoza", "carlos123"));
         assertNull(empleados.autenticar("Carlos Mendoza", ""));
+    }
+
+    private void entrar(String id) throws Exception {
+        assertTrue(new SesionStore(context).iniciar(new EmpleadosStore(context).find(id)));
+    }
+
+    @Test public void rechazaCorreccionesYAnulacionesAjenasSinModificarDatos() throws Exception {
+        assertTrue(store.registrar(servicio, empleado, 500));
+        assertTrue(store.registrar(segundoServicio, segundoEmpleado, 300));
+        String propio = store.getAll().stream().filter(a -> empleado.equals(a.empleadoId)).findFirst().get().id;
+        String ajeno = store.getAll().stream().filter(a -> segundoEmpleado.equals(a.empleadoId)).findFirst().get().id;
+        SharedPreferences prefs = context.getSharedPreferences("atenciones", 0);
+        entrar(empleado);
+        String original = prefs.getString("registros", "");
+        assertFalse(store.cambiar(ajeno, "Corrección ajena", 700L));
+        assertFalse(store.cambiar(ajeno, "Anulación ajena", null));
+        assertEquals(original, prefs.getString("registros", ""));
+        assertTrue(store.cambiar(propio, "Corrección propia", 600L));
+        entrar(segundoEmpleado);
+        original = prefs.getString("registros", "");
+        assertFalse(store.cambiar(propio, "Corrección ajena", 800L));
+        assertFalse(store.cambiar(propio, "Anulación ajena", null));
+        assertEquals(original, prefs.getString("registros", ""));
+        assertTrue(store.cambiar(ajeno, "Corrección propia", 400L));
+        assertTrue(store.cambiar(ajeno, "Anulación propia", null));
+    }
+
+    @Test public void rechazaCambiosSinSesionOConEmpleadoInactivo() throws Exception {
+        assertTrue(store.registrar(servicio, empleado, 500));
+        String id = store.getAll().get(0).id;
+        SharedPreferences prefs = context.getSharedPreferences("atenciones", 0);
+        String original = prefs.getString("registros", "");
+        assertFalse(store.cambiar(id, "Sin sesión", 600L));
+        assertFalse(store.cambiar(id, "Sin sesión", null));
+        entrar(empleado);
+        assertTrue(new EmpleadosStore(context).setActive(empleado, false));
+        assertFalse(store.cambiar(id, "Inactivo", 600L));
+        assertFalse(store.cambiar(id, "Inactivo", null));
+        assertEquals(original, prefs.getString("registros", ""));
+    }
+
+    @Test public void propietarioNoPuedeModificarServiciosDeOtraFecha() throws Exception {
+        entrar(empleado);
+        assertTrue(store.registrar(servicio, empleado, 500));
+        SharedPreferences prefs = context.getSharedPreferences("atenciones", 0);
+        JSONArray rows = new JSONArray(prefs.getString("registros", "[]"));
+        String id = rows.getJSONObject(0).getString("id");
+        rows.getJSONObject(0).put("fechaHora", LocalDate.now().minusDays(1) + "T10:00");
+        String original = rows.toString();
+        assertTrue(prefs.edit().putString("registros", original).commit());
+        assertFalse(store.cambiar(id, "Corrección anterior", 600L));
+        assertFalse(store.cambiar(id, "Anulación anterior", null));
+        assertEquals(original, prefs.getString("registros", ""));
+    }
+
+    @Test public void sesionAsignaServiciosYValidaEmpleadoActivo() throws Exception {
+        assertFalse(store.registrarActual(servicio, "Cliente", "efectivo", 500));
+        entrar(segundoEmpleado);
+        assertTrue(store.registrarActual(servicio, "Cliente", "transferencia", 500));
+        assertEquals(segundoEmpleado, store.getAll().get(0).empleadoId);
+        assertEquals(segundoEmpleado, new SesionStore(context).actual().id);
+        assertTrue(new EmpleadosStore(context).setActive(segundoEmpleado, false));
+        assertNull(new SesionStore(context).actual());
+        assertFalse(store.registrarActual(servicio, "Cliente", "efectivo", 500));
+    }
+
+    @Test public void cierreSoloSumaEfectivoYNoPermiteGuardarParaOtroEmpleado() throws Exception {
+        CatalogoStore catalogo = new CatalogoStore(context);
+        assertTrue(catalogo.save(servicio, "Lavado carro", "carro", 3000));
+        assertTrue(catalogo.save(segundoServicio, "Lavado moto", "moto", 2000));
+        assertTrue(store.registrar(servicio, empleado, "Cliente", "Efectivo", 3000));
+        assertTrue(store.registrar(segundoServicio, empleado, "Cliente", "Transferencia", 2000));
+        entrar(empleado);
+        JSONObject resumen = new CierresStore(context).resumenActual(LocalDate.now());
+        assertEquals(3000, resumen.getLong("esperadoCentavos"));
+        assertEquals(1, resumen.getInt("atenciones"));
+        CierresStore cierres = new CierresStore(context);
+        entrar(segundoEmpleado);
+        assertFalse(cierres.guardar(LocalDate.now(), new java.math.BigDecimal("30.00"), resumen));
+        entrar(empleado);
+        assertTrue(cierres.guardar(LocalDate.now(), new java.math.BigDecimal("30.00"), resumen));
+        JSONObject cierre = cierres.historialActual().getJSONObject(0);
+        assertEquals("30.00", cierre.getString("esperado"));
+        assertEquals("30.00", cierre.getString("entregado"));
+        assertEquals("efectivo", cierre.getString("tipo"));
+        assertFalse(cierres.guardar(LocalDate.now(), new java.math.BigDecimal("30.00"), resumen));
+        assertFalse(store.registrarActual(servicio, "Cliente", "transferencia", 3000));
+        assertFalse(store.cambiar(store.getAll().get(0).id, "Corrección", 100L));
+        entrar(segundoEmpleado);
+        assertEquals(0, cierres.historialActual().length());
+    }
+
+    @Test public void soloTransferenciasPermiteCierreEnCeroYCorreccionesNoSumanEfectivo() throws Exception {
+        entrar(empleado);
+        assertTrue(store.registrarActual(servicio, "Cliente", "transferencia", 500));
+        String id = store.getAll().get(0).id;
+        assertTrue(store.cambiar(id, "Corrección", 700L));
+        assertEquals(0, resumen(empleado).getLong("esperadoCentavos"));
+        assertTrue(store.cambiar(id, "Anular", null));
+        assertTrue(store.registrarActual(segundoServicio, "Cliente", "transferencia", 300));
+        assertTrue(new CierresStore(context).guardar(LocalDate.now(), new java.math.BigDecimal("0.00"),
+                new CierresStore(context).resumenActual(LocalDate.now())));
+    }
+
+    @Test public void metodoDesconocidoBloqueaCierreYDatosAntiguosSonEfectivo() throws Exception {
+        assertTrue(store.registrar(servicio, empleado, 500));
+        SharedPreferences prefs = context.getSharedPreferences("atenciones", 0);
+        JSONArray rows = new JSONArray(prefs.getString("registros", "[]"));
+        rows.getJSONObject(0).remove("metodoPago");
+        assertTrue(prefs.edit().putString("registros", rows.toString()).commit());
+        assertEquals(500, store.resumenEfectivo(empleado, LocalDate.now()).getLong("esperadoCentavos"));
+        entrar(empleado);
+        JSONObject confirmado = new CierresStore(context).resumenActual(LocalDate.now());
+        rows.getJSONObject(0).put("metodoPago", "otro");
+        assertTrue(prefs.edit().putString("registros", rows.toString()).commit());
+        entrar(empleado);
+        try {
+            new CierresStore(context).guardar(LocalDate.now(), new java.math.BigDecimal("5.00"), confirmado);
+            fail("No debe cerrar con método desconocido");
+        } catch (JSONException expected) { }
+        assertEquals(0, new CierresStore(context).historialActual().length());
+        assertEquals(0, store.resumenEfectivo(segundoEmpleado, LocalDate.now()).getLong("esperadoCentavos"));
+    }
+
+    @Test public void migraCierreConRespaldoConservaEntregadoYMarcaFaltaDeDetalle() throws Exception {
+        assertTrue(store.registrar(servicio, empleado, "Cliente", "efectivo", 500));
+        assertTrue(store.registrar(segundoServicio, empleado, "Cliente", "transferencia", 300));
+        JSONArray rows = new JSONArray(context.getSharedPreferences("atenciones", 0).getString("registros", "[]"));
+        for (int i = 0; i < rows.length(); i++) rows.getJSONObject(i).put("fechaHora", LocalDate.now().minusDays(1) + "T10:00");
+        assertTrue(context.getSharedPreferences("atenciones", 0).edit().putString("registros", rows.toString()).commit());
+        JSONObject viejo = new JSONObject().put("fecha", LocalDate.now().minusDays(1).toString())
+                .put("empleadoId", empleado).put("empleado", "Empleado Uno").put("atenciones", 2)
+                .put("esperado", "8.00").put("entregado", "7.00").put("contado", "6.00");
+        JSONObject sinDetalle = new JSONObject(viejo.toString()).put("fecha", LocalDate.now().minusDays(2).toString());
+        String original = new JSONArray().put(viejo).put(sinDetalle).toString();
+        SharedPreferences prefs = context.getSharedPreferences("cierres", 0);
+        assertTrue(prefs.edit().putString("historial", original).commit());
+        entrar(empleado);
+        CierresStore cierres = new CierresStore(context);
+        JSONObject corregido = cierres.historialActual().getJSONObject(0);
+        assertEquals("5.00", corregido.getString("esperado"));
+        assertEquals("7.00", corregido.getString("entregado"));
+        assertEquals("6.00", corregido.getString("contado"));
+        assertEquals(1, corregido.getInt("atenciones"));
+        assertTrue(cierres.historialActual().getJSONObject(1).getBoolean("pendienteRevision"));
+        assertEquals("8.00", cierres.historialActual().getJSONObject(1).getString("esperado"));
+        assertEquals(original, prefs.getString("historial_antes_efectivo_v1", ""));
+        String migrado = prefs.getString("historial", "");
+        assertTrue(cierres.migrar());
+        assertEquals(migrado, prefs.getString("historial", ""));
+        entrar(segundoEmpleado);
+        assertEquals(0, cierres.historialActual().length());
     }
 
     @Test public void migraEjemplosUnaVezConTotalesConsistentes() throws Exception {

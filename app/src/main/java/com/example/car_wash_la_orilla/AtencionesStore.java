@@ -39,7 +39,7 @@ final class AtencionesStore {
             empleadoId = row.getString("empleadoId");
             empleado = row.getString("empleado");
             cliente = row.optString("cliente", "");
-            metodoPago = row.optString("metodoPago", "efectivo");
+            metodoPago = row.optString("metodoPago", "efectivo").trim().toLowerCase(java.util.Locale.ROOT);
             precioCentavos = row.getLong("precioCentavos");
             anulada = row.getBoolean("anulada");
             ejemplo = row.optBoolean("ejemplo", false);
@@ -79,6 +79,8 @@ final class AtencionesStore {
         }
         for (Atencion a : delDia(fecha)) {
             if (a.anulada) continue;
+            validarMetodo(a.metodoPago);
+            if (!"efectivo".equals(a.metodoPago)) continue;
             JSONObject fila = resumen.get(a.empleadoId);
             if (fila == null) { fila = resumen(a.empleadoId, a.empleado); resumen.put(a.empleadoId, fila); }
             fila.put("atenciones", fila.getInt("atenciones") + 1);
@@ -88,6 +90,31 @@ final class AtencionesStore {
         JSONArray result = new JSONArray();
         for (JSONObject fila : resumen.values()) result.put(fila);
         return result;
+    }
+
+    JSONObject resumenEfectivo(String empleadoId, LocalDate fecha) throws JSONException {
+        EmpleadosStore.Empleado empleado = new EmpleadosStore(context).find(empleadoId);
+        if (empleado == null) return null;
+        JSONObject fila = resumen(empleado.id, empleado.nombre);
+        for (Atencion a : delDia(fecha)) {
+            if (!empleadoId.equals(a.empleadoId) || a.anulada) continue;
+            validarMetodo(a.metodoPago);
+            if (!"efectivo".equals(a.metodoPago)) continue;
+            fila.put("atenciones", fila.getInt("atenciones") + 1);
+            fila.put("esperadoCentavos", Math.addExact(fila.getLong("esperadoCentavos"), a.precioCentavos));
+            if (a.ejemplo) fila.put("ejemplo", true);
+        }
+        return fila;
+    }
+
+    private static void validarMetodo(String metodo) throws JSONException {
+        if (!"efectivo".equals(metodo) && !"transferencia".equals(metodo))
+            throw new JSONException("Método de pago desconocido");
+    }
+
+    boolean registrarActual(String servicioId, String cliente, String metodo, long precio) throws JSONException {
+        EmpleadosStore.Empleado empleado = new SesionStore(context).actual();
+        return empleado != null && registrar(servicioId, empleado.id, cliente, metodo, precio);
     }
 
     private static JSONObject resumen(String id, String nombre) throws JSONException {
@@ -104,12 +131,15 @@ final class AtencionesStore {
     }
 
     boolean registrar(String servicioId, String empleadoId, String cliente, String metodoPago, long precioConfirmado) throws JSONException {
+        String metodo = metodoPago == null ? "efectivo" : metodoPago.trim().toLowerCase(java.util.Locale.ROOT);
+        validarMetodo(metodo);
         CatalogoStore.Servicio servicio = new CatalogoStore(context).find(servicioId);
         EmpleadosStore.Empleado empleado = new EmpleadosStore(context).find(empleadoId);
         if (servicio == null || !servicio.activo || empleado == null || !empleado.activo
                 || servicio.precioCentavos != precioConfirmado) return false;
         LocalDateTime ahora = LocalDateTime.now();
-        if (cerrado(empleadoId, ahora.toLocalDate())) return false;
+        if (cerrado(empleadoId, ahora.toLocalDate())
+                || new AperturasStore(context).buscar(empleadoId, ahora.toLocalDate()) == null) return false;
         getAll(); // Validar antes de modificar los datos persistidos.
         JSONArray rows = rows();
         JSONObject row = new JSONObject().put("id", UUID.randomUUID().toString())
@@ -117,7 +147,7 @@ final class AtencionesStore {
                 .put("servicio", servicio.nombre).put("vehiculo", servicio.vehiculo)
                 .put("empleadoId", empleado.id).put("empleado", empleado.nombre)
                 .put("precioCentavos", servicio.precioCentavos).put("anulada", false)
-                .put("metodoPago", metodoPago != null ? metodoPago.toLowerCase() : "efectivo");
+                .put("metodoPago", metodo);
         if (cliente != null && !cliente.trim().isEmpty()) {
             row.put("cliente", cliente.trim());
         }
@@ -126,6 +156,8 @@ final class AtencionesStore {
     }
 
     boolean cambiar(String id, String motivo, Long nuevoPrecio) throws JSONException {
+        EmpleadosStore.Empleado empleado = new SesionStore(context).actual();
+        if (empleado == null) return false;
         if (motivo == null || motivo.trim().isEmpty()
                 || (nuevoPrecio != null && (nuevoPrecio <= 0 || nuevoPrecio > 99999999))) return false;
         getAll();
@@ -134,7 +166,7 @@ final class AtencionesStore {
             JSONObject row = rows.getJSONObject(i);
             if (!id.equals(row.getString("id"))) continue;
             Atencion a = new Atencion(row);
-            if (a.anulada || !a.fechaHora.toLocalDate().equals(LocalDate.now())
+            if (!empleado.id.equals(a.empleadoId) || a.anulada || !a.fechaHora.toLocalDate().equals(LocalDate.now())
                     || cerrado(a.empleadoId, a.fechaHora.toLocalDate())) return false;
             JSONArray cambios = row.optJSONArray("cambios");
             if (cambios == null) cambios = new JSONArray();

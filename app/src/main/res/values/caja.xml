@@ -1,0 +1,29 @@
+<resources>
+    <string name="caja_estado_title">Estado de caja</string>
+    <string name="caja_sin_abrir">Sin abrir</string>
+    <string name="caja_abierta">Abierta</string>
+    <string name="caja_cerrada">Caja cerrada por hoy</string>
+    <string name="caja_ver">Ver caja</string>
+    <string name="caja_ir_inicio">Ir a Inicio</string>
+    <string name="caja_falta_apertura">Abre tu caja desde Inicio para registrar servicios y realizar el cierre.</string>
+    <string name="caja_apertura_detalle">Fondo $%1$s · Apertura %2$s</string>
+    <string name="caja_sin_apertura">Sin apertura registrada</string>
+    <string name="caja_sin_transferencias">Sin dato de transferencias</string>
+    <string name="caja_fondo">Fondo inicial</string>
+    <string name="caja_cobros">Cobros en efectivo</string>
+    <string name="caja_transferencias">Cantidad de transferencias</string>
+    <string name="caja_total">Total de efectivo esperado</string>
+    <string name="caja_incluye_fondo">El efectivo entregado incluye el fondo inicial. Las transferencias no generan efectivo pendiente.</string>
+    <string name="caja_historial_detalle">Fondo inicial %1$s\nCobros en efectivo %2$s\nCantidad de transferencias: %3$s\nTotal de efectivo esperado %4$s\nEfectivo entregado %5$s</string>
+    <string name="caja_historial_sin_datos">%1$s\n%2$s</string>
+    <string name="apertura_title">Abrir caja</string>
+    <string name="apertura_monto">Efectivo inicial</string>
+    <string name="apertura_continuar">Continuar</string>
+    <string name="apertura_confirmar">Confirmar apertura</string>
+    <string name="apertura_cancelar">Cancelar</string>
+    <string name="apertura_editar">Editar monto</string>
+    <string name="apertura_confirmar_monto">¿Abrir tu caja con $%1$s? El fondo inicial quedará fijo para esta jornada.</string>
+    <string name="apertura_guardada">Caja abierta</string>
+    <string name="apertura_error">No se pudo abrir la caja. Revisa si cambió la fecha o si la caja ya está abierta o cerrada.</string>
+    <string name="caja_historial_ejemplo">Registro de ejemplo</string>
+</resources>

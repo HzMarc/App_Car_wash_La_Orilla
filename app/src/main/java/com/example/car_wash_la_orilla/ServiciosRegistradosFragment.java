@@ -93,9 +93,14 @@ public class ServiciosRegistradosFragment extends Fragment {
 
     private void inicializarDatosServicios() {
         listaServiciosCompleta.clear();
+        listaServiciosFiltrada.clear();
+        indiceSeleccionado = 0;
+        EmpleadosStore.Empleado empleado = SesionStore.requerir(requireActivity());
+        if (empleado == null) return;
         try {
             for (AtencionesStore.Atencion atencion : new AtencionesStore(requireContext()).delDia(java.time.LocalDate.now())) {
-                listaServiciosCompleta.add(new ElementoServicio(atencion, atencion.ejemplo));
+                if (empleado.id.equals(atencion.empleadoId))
+                    listaServiciosCompleta.add(new ElementoServicio(atencion, atencion.ejemplo));
             }
         } catch (org.json.JSONException error) {
             Toast.makeText(requireContext(), R.string.atenciones_error, Toast.LENGTH_LONG).show();
@@ -262,6 +267,7 @@ public class ServiciosRegistradosFragment extends Fragment {
     }
 
     private void mostrarDialogoMotivo(boolean corregir) {
+        if (SesionStore.requerir(requireActivity()) == null) return;
         String tituloAccion = corregir ? "Corregir importe de atención" : "Anular atención";
         if (listaServiciosFiltrada.isEmpty() || indiceSeleccionado < 0 || indiceSeleccionado >= listaServiciosFiltrada.size()) {
             Toast.makeText(requireContext(), "Selecciona una atención primero", Toast.LENGTH_SHORT).show();
@@ -308,6 +314,10 @@ public class ServiciosRegistradosFragment extends Fragment {
 
         if (botonConfirmar != null) {
             botonConfirmar.setOnClickListener(v -> {
+                if (SesionStore.requerir(requireActivity()) == null) {
+                    dialogo.dismiss();
+                    return;
+                }
                 String motivo = campoMotivo.getText() != null ? campoMotivo.getText().toString().trim() : "";
                 if (motivo.isEmpty()) {
                     Toast.makeText(requireContext(), "Por favor ingresa un motivo", Toast.LENGTH_SHORT).show();

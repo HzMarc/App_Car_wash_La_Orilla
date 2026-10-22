@@ -6,7 +6,7 @@
     <string name="nav_inicio">Inicio</string>
     <string name="nav_registrar">Registrar</string>
     <string name="nav_servicios">Servicios</string>
-    <string name="nav_cierre">Cierre</string>
+    <string name="nav_cierre">Caja</string>
     <string name="nav_catalogo">Catálogo</string>
     <string name="nav_menu">Menú</string>
     <string name="ejemplos_error">No se pudieron cargar todos los datos de ejemplo.</string>

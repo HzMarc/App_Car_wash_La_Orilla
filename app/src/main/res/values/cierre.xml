@@ -49,14 +49,14 @@
         <item name="boxStrokeColor">@color/app_black</item>
         <item name="boxBackgroundColor">@color/app_card_bg</item>
     </style>
-    <string name="cierre_title">Cierre diario</string>
-    <string name="cierre_today">Cierre de hoy</string>
+    <string name="cierre_title">Caja</string>
+    <string name="cierre_today">Caja de hoy</string>
     <string name="cierre_history">Historial</string>
     <string name="cierre_employee">Empleado</string>
     <string name="cierre_select">Seleccionar empleado</string>
     <string name="cierre_no_employees">Aún no hay empleados disponibles para realizar un cierre.</string>
-    <string name="cierre_count">Atenciones</string>
-    <string name="cierre_expected">Esperado</string>
+    <string name="cierre_count">Atenciones en efectivo</string>
+    <string name="cierre_expected">Efectivo esperado</string>
     <string name="cierre_delivered">Efectivo entregado</string>
     <string name="cierre_difference">DIFERENCIA</string>
     <string name="cierre_balanced">✓ CAJA CUADRADA</string>
@@ -74,7 +74,10 @@
     <string name="cierre_incluye_ejemplos">Este total incluye atenciones de ejemplo.</string>
     <string name="cierre_already_saved">Cierre ya guardado</string>
     <string name="cierre_history_error">No se pudo leer el historial guardado.</string>
-    <string name="cierre_history_detail">Esperado %1$s · Entregado %2$s</string>
+    <string name="cierre_history_detail">Efectivo esperado %1$s · Entregado %2$s</string>
     <string name="cierre_history_detail_legacy">Esperado %1$s · Contado %2$s · Entregado %3$s</string>
-    <string name="cierre_history_count">%1$d atenciones · %2$s</string>
+    <string name="cierre_history_count">%1$d atenciones en efectivo · %2$s</string>
+    <string name="cierre_pending_review">Pendiente de revisión: detalle insuficiente</string>
+    <string name="cierre_history_count_legacy">%1$d atenciones · %2$s</string>
+    <string name="cierre_history_detail_pending">Esperado original %1$s · Entregado %2$s</string>
 </resources>

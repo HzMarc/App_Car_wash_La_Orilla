@@ -2,14 +2,12 @@ package com.example.car_wash_la_orilla;
 
 import android.os.Bundle;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,7 +28,6 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -62,8 +59,11 @@ public class CierreFragment extends Fragment {
         try {
             String fecha = requireActivity().getIntent().getStringExtra(EXTRA_FECHA);
             if (fecha != null) summaryDate = LocalDate.parse(fecha);
-            JSONArray datos = new AtencionesStore(requireContext()).resumenes(summaryDate);
-            for (int i = 0; i < datos.length(); i++) summaries.add(datos.getJSONObject(i));
+            EmpleadosStore.Empleado empleado = SesionStore.requerir(requireActivity());
+            if (empleado == null) return;
+            JSONObject resumen = new CierresStore(requireContext()).resumenActual(summaryDate);
+            if (resumen == null) return;
+            summaries.add(resumen);
             datosValidos = true;
         } catch (JSONException | RuntimeException error) {
             summaries.clear();
@@ -97,15 +97,13 @@ public class CierreFragment extends Fragment {
         super.onDestroyView();
     }
 
-    private SharedPreferences storage() { return requireContext().getSharedPreferences("cierres", Context.MODE_PRIVATE); }
-    private JSONArray history() throws JSONException { return new JSONArray(storage().getString("historial", "[]")); }
+    private JSONArray history() throws JSONException { return new CierresStore(requireContext()).historialActual(); }
     private static String money(BigDecimal amount) { return "$" + amount.setScale(2).toPlainString(); }
     private static String signedMoney(BigDecimal amount) {
         return (amount.signum() < 0 ? "−" : amount.signum() > 0 ? "+" : "") + money(amount.abs());
     }
     private static BigDecimal amount(TextInputEditText input) {
-        String value = String.valueOf(input.getText()).trim().replace(',', '.');
-        return value.matches("[0-9]{1,9}(\\.[0-9]{1,2})?") ? new BigDecimal(value).setScale(2) : null;
+        return AperturasStore.importe(String.valueOf(input.getText()));
     }
     private static int status(BigDecimal difference) {
         return difference.signum() < 0 ? R.string.cierre_short : difference.signum() > 0 ? R.string.cierre_over : R.string.cierre_balanced;
@@ -125,24 +123,13 @@ public class CierreFragment extends Fragment {
 
         private void recargar(String empleadoId) {
             host().cargarResumenes();
-            List<String> nombres = new ArrayList<>();
-            selected = -1;
-            for (int i = 0; i < host().summaries.size(); i++) {
-                JSONObject fila = host().summaries.get(i);
-                nombres.add(fila.optString("empleado"));
-                if (fila.optString("empleadoId").equals(empleadoId)) selected = i;
+            selected = host().summaries.isEmpty() ? -1 : 0;
+            TextView employee = content.findViewById(R.id.cierre_employee);
+            employee.setText(selected < 0 ? "" : host().summaries.get(selected).optString("empleado"));
+            if (selected >= 0 && "cerrada".equals(host().summaries.get(selected).optString("estado"))) {
+                String entregado = host().summaries.get(selected).optString("entregado");
+                if (!entregado.equals(String.valueOf(delivered.getText()))) delivered.setText(entregado);
             }
-            if (selected < 0 && !nombres.isEmpty()) {
-                selected = 0;
-                for (int i = 0; i < host().summaries.size(); i++) {
-                    if (host().summaries.get(i).optInt("atenciones") > 0) { selected = i; break; }
-                }
-            }
-            MaterialAutoCompleteTextView selector = content.findViewById(R.id.cierre_employee);
-            selector.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, nombres));
-            selector.setEnabled(!nombres.isEmpty());
-            selector.setText(selected < 0 ? "" : nombres.get(selected), false);
-            content.findViewById(R.id.cierre_employee_notice).setVisibility(nombres.isEmpty() ? View.VISIBLE : View.GONE);
             refresh();
         }
 
@@ -154,8 +141,6 @@ public class CierreFragment extends Fragment {
             content = view;
             delivered = view.findViewById(R.id.cierre_delivered);
             save = view.findViewById(R.id.cierre_save);
-            MaterialAutoCompleteTextView employee = view.findViewById(R.id.cierre_employee);
-            employee.setOnItemClickListener((parent, item, position, id) -> { selected = position; refresh(); });
             TextWatcher watcher = new TextWatcher() {
                 @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
                 @Override public void onTextChanged(CharSequence s, int start, int before, int count) { refresh(); }
@@ -163,6 +148,14 @@ public class CierreFragment extends Fragment {
             };
             delivered.addTextChangedListener(watcher);
             save.setOnClickListener(v -> saveClosure());
+            view.findViewById(R.id.caja_ir_inicio).setOnClickListener(v -> {
+                if (getActivity() instanceof MainActivity) ((MainActivity) getActivity()).mostrarInicio();
+                else {
+                    startActivity(new android.content.Intent(requireContext(), MainActivity.class)
+                            .addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    requireActivity().finish();
+                }
+            });
             recargar(state == null ? null : state.getString("empleado_id"));
         }
 
@@ -197,7 +190,21 @@ public class CierreFragment extends Fragment {
             aviso.setVisibility(host().summaries.isEmpty() || ejemplos ? View.VISIBLE : View.GONE);
             ((TextInputLayout) content.findViewById(R.id.cierre_delivered_layout)).setError(
                     delivered.length() > 0 && handed == null ? getString(R.string.cierre_invalid_amount) : null);
-            boolean ready = host().datosValidos && selected >= 0 && handed != null;
+            JSONObject caja = selected < 0 ? null : host().summaries.get(selected);
+            String estado = caja == null ? "sin_abrir" : caja.optString("estado");
+            boolean abierta = "abierta".equals(estado), cerrada = "cerrada".equals(estado);
+            content.findViewById(R.id.caja_sin_apertura).setVisibility(!abierta && !cerrada ? View.VISIBLE : View.GONE);
+            content.findViewById(R.id.caja_desglose).setVisibility(abierta || cerrada ? View.VISIBLE : View.GONE);
+            content.findViewById(R.id.cierre_delivered_layout).setVisibility(abierta || cerrada ? View.VISIBLE : View.GONE);
+            content.findViewById(R.id.cierre_difference_card).setVisibility(abierta || cerrada ? View.VISIBLE : View.GONE);
+            delivered.setEnabled(abierta);
+            ((TextView) content.findViewById(R.id.caja_fondo)).setText(caja != null && caja.has("aperturaCentavos")
+                    ? money(BigDecimal.valueOf(caja.optLong("aperturaCentavos"), 2)) : getString(R.string.caja_sin_apertura));
+            ((TextView) content.findViewById(R.id.caja_cobros)).setText(caja != null && caja.has("cobrosEfectivoCentavos")
+                    ? money(BigDecimal.valueOf(caja.optLong("cobrosEfectivoCentavos"), 2)) : "—");
+            ((TextView) content.findViewById(R.id.caja_transferencias)).setText(caja != null && caja.has("transferencias")
+                    ? String.valueOf(caja.optInt("transferencias")) : getString(R.string.caja_sin_transferencias));
+            boolean ready = host().datosValidos && (abierta || cerrada) && handed != null;
             BigDecimal diff = ready ? handed.subtract(expected) : BigDecimal.ZERO;
             int background = ready && diff.signum() < 0 ? R.color.ink : ready && diff.signum() > 0 ? R.color.gold : R.color.bg;
             int foreground = ready && diff.signum() < 0 ? R.color.bg : R.color.ink;
@@ -219,6 +226,7 @@ public class CierreFragment extends Fragment {
         }
 
         private void saveClosure() {
+            if (SesionStore.requerir(requireActivity()) == null) return;
             BigDecimal handed = amount(delivered);
             if (selected < 0 || handed == null || !host().summaryDate.equals(LocalDate.now())) return;
             String anterior = host().summaries.get(selected).toString();
@@ -232,18 +240,10 @@ public class CierreFragment extends Fragment {
             try {
                 if (alreadyClosed()) { refresh(); return; }
                 JSONObject summary = host().summaries.get(selected);
-                JSONObject row = new JSONObject();
-                row.put("fecha", host().summaryDate.toString());
-                row.put("empleadoId", summary.getString("empleadoId"));
-                row.put("empleado", summary.getString("empleado"));
-                row.put("atenciones", summary.getInt("atenciones"));
-                row.put("esperado", expected().toPlainString());
-                row.put("entregado", handed.toPlainString());
-                JSONArray rows = host().history();
-                rows.put(row);
-                if (!host().storage().edit().putString("historial", rows.toString()).commit()) throw new IllegalStateException();
+                if (!new CierresStore(requireContext()).guardar(host().summaryDate, handed, summary))
+                    throw new IllegalStateException();
                 Toast.makeText(requireContext(), R.string.cierre_saved, Toast.LENGTH_SHORT).show();
-                refresh();
+                recargar(idSeleccionado());
                 host().getChildFragmentManager().setFragmentResult("cierre_guardado", new Bundle());
                 ((ViewPager2) host().requireView().findViewById(R.id.cierre_pager)).setCurrentItem(1);
             } catch (JSONException | IllegalStateException failure) {
@@ -268,7 +268,8 @@ public class CierreFragment extends Fragment {
             List<JSONObject> rows = new ArrayList<>();
             try {
                 JSONArray data = ((CierreFragment) requireParentFragment()).history();
-                for (int i = data.length() - 1; i >= 0; i--) rows.add(data.getJSONObject(i));
+                for (int i = 0; i < data.length(); i++) rows.add(data.getJSONObject(i));
+                rows.sort((a, b) -> b.optString("fecha").compareTo(a.optString("fecha")));
             } catch (JSONException failure) {
                 ((TextView) view.findViewById(R.id.cierre_history_empty).findViewById(R.id.cierre_history_empty_title)).setText(R.string.cierre_history_error);
             }
@@ -295,10 +296,12 @@ public class CierreFragment extends Fragment {
             BigDecimal diff = compared.subtract(expected);
             String date = LocalDate.parse(row.optString("fecha")).format(DateTimeFormatter.ofPattern("dd MMM yyyy", new Locale("es", "SV")));
             ((TextView) v.findViewById(R.id.history_date)).setText(date);
-            ((TextView) v.findViewById(R.id.history_count)).setText(ctx.getString(R.string.cierre_history_count, row.optInt("atenciones"), row.optString("empleado")));
+            ((TextView) v.findViewById(R.id.history_count)).setText(ctx.getString(
+                    row.optBoolean("pendienteRevision") ? R.string.cierre_history_count_legacy : R.string.cierre_history_count,
+                    row.optInt("atenciones"), row.optString("empleado")));
             ((TextView) v.findViewById(R.id.history_difference)).setText(signedMoney(diff));
             TextView label = v.findViewById(R.id.history_status);
-            label.setText(status(diff));
+            label.setText(row.optBoolean("pendienteRevision") ? R.string.cierre_pending_review : status(diff));
             int bg = diff.signum() < 0 ? R.color.ink : diff.signum() > 0 ? R.color.gold : R.color.bg;
             GradientDrawable chip = new GradientDrawable();
             chip.setColor(ctx.getColor(bg));
@@ -306,9 +309,30 @@ public class CierreFragment extends Fragment {
             chip.setStroke((int) ctx.getResources().getDisplayMetrics().density, ctx.getColor(R.color.ink));
             label.setBackground(chip);
             label.setTextColor(ctx.getColor(diff.signum() < 0 ? R.color.bg : R.color.ink));
-            ((TextView) v.findViewById(R.id.history_detail)).setText(legacy
+            String detalle;
+            if (row.has("aperturaCentavos") && row.has("cobrosEfectivoCentavos") && row.has("transferencias")) {
+                detalle = ctx.getString(R.string.caja_historial_detalle,
+                        money(BigDecimal.valueOf(row.optLong("aperturaCentavos"), 2)),
+                        money(BigDecimal.valueOf(row.optLong("cobrosEfectivoCentavos"), 2)),
+                        String.valueOf(row.optInt("transferencias")), money(expected), money(handed));
+            } else {
+                detalle = legacy ? ctx.getString(R.string.cierre_history_detail_legacy, money(expected), money(compared), money(handed))
+                        : ctx.getString(row.optBoolean("pendienteRevision") ? R.string.cierre_history_detail_pending
+                                : R.string.cierre_history_detail, money(expected), money(handed));
+                if (!row.has("aperturaCentavos")) detalle += "\n" + ctx.getString(R.string.caja_sin_apertura);
+                if (!row.has("transferencias")) detalle += "\n" + ctx.getString(R.string.caja_sin_transferencias);
+            }
+            String compacto = legacy
                     ? ctx.getString(R.string.cierre_history_detail_legacy, money(expected), money(compared), money(handed))
-                    : ctx.getString(R.string.cierre_history_detail, money(expected), money(handed)));
+                    : ctx.getString(row.optBoolean("pendienteRevision") ? R.string.cierre_history_detail_pending
+                            : R.string.cierre_history_detail, money(expected), money(handed));
+            ((TextView) v.findViewById(R.id.history_detail)).setText(compacto);
+            if (row.optBoolean("ejemplo")) detalle += "\n\n" + ctx.getString(R.string.caja_historial_ejemplo);
+            final String detalleCompleto = detalle;
+            v.setFocusable(true);
+            v.setOnClickListener(view -> new com.google.android.material.dialog.MaterialAlertDialogBuilder(ctx)
+                    .setTitle(date + " · " + row.optString("empleado"))
+                    .setMessage(detalleCompleto).setPositiveButton(R.string.perfil_qr_cerrar, null).show());
         }
         @Override public int getItemCount() { return rows.size(); }
     }

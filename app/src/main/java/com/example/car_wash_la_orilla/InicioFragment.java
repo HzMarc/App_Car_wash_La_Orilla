@@ -25,6 +25,13 @@ public class InicioFragment extends Fragment {
 
     @Override public void onResume() {
         super.onResume();
+        actualizar();
+    }
+
+    private void actualizar() {
+        if (getView() == null) return;
+        EmpleadosStore.Empleado empleado = SesionStore.requerir(requireActivity());
+        if (empleado == null) return;
         View vista = requireView();
         LocalDate hoy = LocalDate.now();
         ((TextView) vista.findViewById(R.id.textoFecha)).setText("Hoy · "
@@ -32,19 +39,31 @@ public class InicioFragment extends Fragment {
         LinearLayout recientes = vista.findViewById(R.id.contenedorListaRecientes);
         recientes.removeAllViews();
         try {
+            org.json.JSONObject caja = new CierresStore(requireContext()).resumenActual(hoy);
+            String estado = caja.getString("estado");
+            ((TextView) vista.findViewById(R.id.inicio_caja_estado)).setText("abierta".equals(estado)
+                    ? R.string.caja_abierta : "cerrada".equals(estado) ? R.string.caja_cerrada : R.string.caja_sin_abrir);
+            TextView detalle = vista.findViewById(R.id.inicio_caja_detalle);
+            detalle.setVisibility(caja.has("aperturaCentavos") ? View.VISIBLE : View.GONE);
+            if (caja.has("aperturaCentavos")) detalle.setText(getString(R.string.caja_apertura_detalle,
+                    BigDecimal.valueOf(caja.getLong("aperturaCentavos"), 2).toPlainString(),
+                    java.time.LocalDateTime.parse(caja.getString("fechaApertura")).format(DateTimeFormatter.ofPattern("HH:mm"))));
+            ((TextView) vista.findViewById(R.id.inicio_caja_accion)).setText(
+                    "sin_abrir".equals(estado) ? R.string.apertura_title : R.string.caja_ver);
+            vista.findViewById(R.id.inicio_caja_accion).setEnabled(true);
+            vista.findViewById(R.id.botonRegistrarServicio).setEnabled(!"cerrada".equals(estado));
+            ((TextView) vista.findViewById(R.id.inicio_esperado)).setText("sin_abrir".equals(estado) ? "—"
+                    : "$" + BigDecimal.valueOf(caja.getLong("esperadoCentavos"), 2).toPlainString());
             List<AtencionesStore.Atencion> atenciones = new ArrayList<>();
-            long centavos = 0;
             int carros = 0, motos = 0;
             for (AtencionesStore.Atencion atencion : new AtencionesStore(requireContext()).delDia(hoy)) {
-                if (atencion.anulada) continue;
+                if (atencion.anulada || !empleado.id.equals(atencion.empleadoId)) continue;
                 atenciones.add(atencion);
-                centavos = Math.addExact(centavos, atencion.precioCentavos);
                 if (atencion.vehiculo.equals("carro")) carros++; else motos++;
             }
             ((TextView) vista.findViewById(R.id.inicio_atenciones)).setText(String.valueOf(atenciones.size()));
             ((TextView) vista.findViewById(R.id.inicio_carros)).setText(String.valueOf(carros));
             ((TextView) vista.findViewById(R.id.inicio_motos)).setText(String.valueOf(motos));
-            ((TextView) vista.findViewById(R.id.inicio_esperado)).setText("$" + BigDecimal.valueOf(centavos, 2).toPlainString());
             for (int i = 0; i < Math.min(3, atenciones.size()); i++) agregarReciente(recientes, atenciones.get(i));
             if (atenciones.isEmpty()) {
                 TextView vacio = new TextView(requireContext());
@@ -52,10 +71,29 @@ public class InicioFragment extends Fragment {
                 vacio.setTextColor(requireContext().getColor(R.color.app_text_secondary));
                 recientes.addView(vacio);
             }
-        } catch (org.json.JSONException | ArithmeticException error) {
-            for (int id : new int[] {R.id.inicio_atenciones, R.id.inicio_carros, R.id.inicio_motos, R.id.inicio_esperado}) {
+        } catch (org.json.JSONException | RuntimeException error) {
+            for (int id : new int[] {R.id.inicio_atenciones, R.id.inicio_carros, R.id.inicio_motos, R.id.inicio_esperado})
                 ((TextView) vista.findViewById(id)).setText("—");
+            vista.findViewById(R.id.inicio_caja_accion).setEnabled(false);
+            vista.findViewById(R.id.botonRegistrarServicio).setEnabled(false);
+            Toast.makeText(requireContext(), R.string.atenciones_error, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void accionCaja(boolean registrar) {
+        if (SesionStore.requerir(requireActivity()) == null) return;
+        actualizar();
+        try {
+            String estado = new CierresStore(requireContext()).resumenActual(LocalDate.now()).getString("estado");
+            if ("sin_abrir".equals(estado)) {
+                if (registrar) Toast.makeText(requireContext(), R.string.caja_falta_apertura, Toast.LENGTH_LONG).show();
+                if (getChildFragmentManager().findFragmentByTag("apertura") == null)
+                    new AperturaDialogFragment().show(getChildFragmentManager(), "apertura");
+            } else if (getActivity() instanceof MainActivity) {
+                if (registrar && "abierta".equals(estado)) ((MainActivity) getActivity()).mostrarRegistrar();
+                else ((MainActivity) getActivity()).mostrarCierre();
             }
+        } catch (org.json.JSONException error) {
             Toast.makeText(requireContext(), R.string.atenciones_error, Toast.LENGTH_LONG).show();
         }
     }
@@ -95,20 +133,9 @@ public class InicioFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View vista = inflater.inflate(R.layout.fragment_inicio, container, false);
 
-        vista.findViewById(R.id.botonEmpleados).setOnClickListener(v -> {
-            if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).mostrarEmpleados();
-            }
-        });
-
-        View botonRegistrarServicio = vista.findViewById(R.id.botonRegistrarServicio);
-        if (botonRegistrarServicio != null) {
-            botonRegistrarServicio.setOnClickListener(v -> {
-                if (getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).mostrarRegistrar();
-                }
-            });
-        }
+        vista.findViewById(R.id.botonRegistrarServicio).setOnClickListener(v -> accionCaja(true));
+        vista.findViewById(R.id.inicio_caja_accion).setOnClickListener(v -> accionCaja(false));
+        getChildFragmentManager().setFragmentResultListener("apertura_guardada", this, (key, data) -> actualizar());
 
         return vista;
     }

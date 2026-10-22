@@ -88,13 +88,49 @@ final class DatosEjemplo {
                                 .put("ejemplo", true));
                     }
                 }
-                return cierres.edit().putString("historial", historial.toString())
-                        .putBoolean(MARCA, true).commit();
+                if (!cierres.edit().putString("historial", historial.toString())
+                        .putBoolean(MARCA, true).commit()) return false;
             }
-            return true;
+            return ampliarHistorial(cierres, ids);
         } catch (JSONException error) {
             // Conservar los datos almacenados si no se pueden interpretar.
             return false;
         }
     }
+    /** Agrega seis jornadas por empleado sin modificar cierres existentes ni cerrar el día actual. */
+    private static boolean ampliarHistorial(SharedPreferences prefs, String[] ids) throws JSONException {
+        String marca = "historial_empleados_v2_cargado";
+        if (prefs.getBoolean(marca, false)) return true;
+        JSONArray historial = new JSONArray(prefs.getString("historial", "[]"));
+        LocalDate hoy = LocalDate.now();
+        for (int dia = 2; dia <= 7; dia++) {
+            String fecha = hoy.minusDays(dia).toString();
+            for (int i = 0; i < NOMBRES.length; i++) {
+                if (ids[i] == null) continue;
+                boolean existe = false;
+                for (int j = 0; j < historial.length(); j++) {
+                    JSONObject row = historial.getJSONObject(j);
+                    if (ids[i].equals(row.getString("empleadoId")) && fecha.equals(row.getString("fecha"))) {
+                        existe = true;
+                        break;
+                    }
+                }
+                if (existe) continue;
+                long fondo = 1000L;
+                long ventas = (i + 1) * 500L + dia * 300L;
+                long esperado = fondo + ventas;
+                int estado = (i + dia) % 3;
+                long entregado = esperado + (estado == 0 ? 0 : estado == 1 ? -100 : 150);
+                historial.put(new JSONObject().put("fecha", fecha).put("empleadoId", ids[i])
+                        .put("empleado", NOMBRES[i]).put("atenciones", 3 + (i + dia) % 6)
+                        .put("esperado", java.math.BigDecimal.valueOf(esperado, 2).toPlainString())
+                        .put("entregado", java.math.BigDecimal.valueOf(entregado, 2).toPlainString())
+                        .put("aperturaCentavos", fondo).put("fechaApertura", fecha + "T08:00:00")
+                        .put("cobrosEfectivoCentavos", ventas).put("transferencias", (i + dia) % 4)
+                        .put("tipo", "efectivo").put("ejemplo", true));
+            }
+        }
+        return prefs.edit().putString("historial", historial.toString()).putBoolean(marca, true).commit();
+    }
+
 }

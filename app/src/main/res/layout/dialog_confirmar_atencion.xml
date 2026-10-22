@@ -62,12 +62,22 @@
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/textoDialogoEmpleado"
+                android:id="@+id/textoDialogoCliente"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:fontFamily="sans-serif"
-                android:text="• Empleado: Carlos Mendoza"
+                android:text="• Encargado: Juan Pérez"
+                android:textColor="@color/app_black"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/textoDialogoMetodoPago"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:fontFamily="sans-serif"
+                android:text="• Método de pago: Efectivo"
                 android:textColor="@color/app_black"
                 android:textSize="14sp" />
 

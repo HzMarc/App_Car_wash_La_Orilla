@@ -27,7 +27,7 @@ final class AtencionesStore {
     }
 
     static final class Atencion {
-        final String id, servicioId, servicio, vehiculo, empleadoId, empleado;
+        final String id, servicioId, servicio, vehiculo, empleadoId, empleado, cliente, metodoPago;
         final LocalDateTime fechaHora;
         final long precioCentavos;
         final boolean anulada, ejemplo;
@@ -38,6 +38,8 @@ final class AtencionesStore {
             vehiculo = row.getString("vehiculo");
             empleadoId = row.getString("empleadoId");
             empleado = row.getString("empleado");
+            cliente = row.optString("cliente", "");
+            metodoPago = row.optString("metodoPago", "efectivo");
             precioCentavos = row.getLong("precioCentavos");
             anulada = row.getBoolean("anulada");
             ejemplo = row.optBoolean("ejemplo", false);
@@ -94,6 +96,14 @@ final class AtencionesStore {
     }
 
     boolean registrar(String servicioId, String empleadoId, long precioConfirmado) throws JSONException {
+        return registrar(servicioId, empleadoId, null, "efectivo", precioConfirmado);
+    }
+
+    boolean registrar(String servicioId, String empleadoId, String cliente, long precioConfirmado) throws JSONException {
+        return registrar(servicioId, empleadoId, cliente, "efectivo", precioConfirmado);
+    }
+
+    boolean registrar(String servicioId, String empleadoId, String cliente, String metodoPago, long precioConfirmado) throws JSONException {
         CatalogoStore.Servicio servicio = new CatalogoStore(context).find(servicioId);
         EmpleadosStore.Empleado empleado = new EmpleadosStore(context).find(empleadoId);
         if (servicio == null || !servicio.activo || empleado == null || !empleado.activo
@@ -102,11 +112,16 @@ final class AtencionesStore {
         if (cerrado(empleadoId, ahora.toLocalDate())) return false;
         getAll(); // Validar antes de modificar los datos persistidos.
         JSONArray rows = rows();
-        rows.put(new JSONObject().put("id", UUID.randomUUID().toString())
+        JSONObject row = new JSONObject().put("id", UUID.randomUUID().toString())
                 .put("fechaHora", ahora.toString()).put("servicioId", servicio.id)
                 .put("servicio", servicio.nombre).put("vehiculo", servicio.vehiculo)
                 .put("empleadoId", empleado.id).put("empleado", empleado.nombre)
-                .put("precioCentavos", servicio.precioCentavos).put("anulada", false));
+                .put("precioCentavos", servicio.precioCentavos).put("anulada", false)
+                .put("metodoPago", metodoPago != null ? metodoPago.toLowerCase() : "efectivo");
+        if (cliente != null && !cliente.trim().isEmpty()) {
+            row.put("cliente", cliente.trim());
+        }
+        rows.put(row);
         return write(rows);
     }
 

@@ -20,23 +20,27 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class RegistrarServicioFragment extends Fragment {
 
     private LinearLayout contenedorServicios;
-    private TextView textoEmpleadoSeleccionado;
+    private TextInputEditText campoCliente;
     private TextView textoPrecioTotal;
+
+    private LinearLayout contenedorEfectivo;
+    private TextInputEditText campoMontoRecibido;
+    private TextView textoCambioCalculado;
 
     private boolean esCarroSeleccionado = true;
     private int indiceServicioSeleccionado = 0;
-    private int indiceEmpleadoSeleccionado = 0;
+    private String metodoPagoSeleccionado = "Efectivo";
 
-    private String[] empleados = {};
     private String[] serviciosCarro = {};
     private String[] preciosCarro = {};
     private String[] serviciosMoto = {};
     private String[] preciosMoto = {};
-    private String[] idsEmpleados = {}, idsCarro = {}, idsMoto = {};
+    private String[] idsCarro = {}, idsMoto = {};
     private MaterialButton botonGuardarAtencion;
 
     private void cargarCatalogos() {
@@ -44,8 +48,6 @@ public class RegistrarServicioFragment extends Fragment {
         java.util.List<String> importesCarro = new java.util.ArrayList<>();
         java.util.List<String> nombresMoto = new java.util.ArrayList<>();
         java.util.List<String> importesMoto = new java.util.ArrayList<>();
-        java.util.List<String> nombresEmpleados = new java.util.ArrayList<>();
-        java.util.List<String> empleadosIds = new java.util.ArrayList<>();
         java.util.List<String> carroIds = new java.util.ArrayList<>();
         java.util.List<String> motoIds = new java.util.ArrayList<>();
         try {
@@ -61,19 +63,11 @@ public class RegistrarServicioFragment extends Fragment {
                     importesMoto.add("$" + servicio.precio());
                 }
             }
-            for (EmpleadosStore.Empleado empleado : new EmpleadosStore(requireContext()).getAll()) {
-                if (empleado.activo) {
-                    nombresEmpleados.add(empleado.nombre);
-                    empleadosIds.add(empleado.id);
-                }
-            }
         } catch (org.json.JSONException error) {
             nombresCarro.clear();
             importesCarro.clear();
             nombresMoto.clear();
             importesMoto.clear();
-            nombresEmpleados.clear();
-            empleadosIds.clear();
             carroIds.clear();
             motoIds.clear();
             Toast.makeText(requireContext(), R.string.registrar_catalogos_error, Toast.LENGTH_LONG).show();
@@ -82,13 +76,11 @@ public class RegistrarServicioFragment extends Fragment {
         preciosCarro = importesCarro.toArray(new String[0]);
         serviciosMoto = nombresMoto.toArray(new String[0]);
         preciosMoto = importesMoto.toArray(new String[0]);
-        empleados = nombresEmpleados.toArray(new String[0]);
-        idsEmpleados = empleadosIds.toArray(new String[0]);
         idsCarro = carroIds.toArray(new String[0]);
         idsMoto = motoIds.toArray(new String[0]);
-        indiceEmpleadoSeleccionado = 0;
         indiceServicioSeleccionado = 0;
     }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -96,13 +88,37 @@ public class RegistrarServicioFragment extends Fragment {
 
         TabLayout vehiculos = vista.findViewById(R.id.registrar_vehiculo_tabs);
         contenedorServicios = vista.findViewById(R.id.contenedorServicios);
-        MaterialCardView tarjetaSeleccionarEmpleado = vista.findViewById(R.id.tarjetaSeleccionarEmpleado);
-        textoEmpleadoSeleccionado = vista.findViewById(R.id.textoEmpleadoSeleccionado);
+        campoCliente = vista.findViewById(R.id.campoCliente);
         textoPrecioTotal = vista.findViewById(R.id.textoPrecioTotal);
         botonGuardarAtencion = vista.findViewById(R.id.botonGuardarAtencion);
+        TabLayout tabsMetodoPago = vista.findViewById(R.id.tabsMetodoPago);
 
-        if (tarjetaSeleccionarEmpleado != null) {
-            tarjetaSeleccionarEmpleado.setOnClickListener(v -> mostrarDialogoSeleccionEmpleado());
+        contenedorEfectivo = vista.findViewById(R.id.contenedorEfectivo);
+        campoMontoRecibido = vista.findViewById(R.id.campoMontoRecibido);
+        textoCambioCalculado = vista.findViewById(R.id.textoCambioCalculado);
+
+        if (campoMontoRecibido != null) {
+            campoMontoRecibido.addTextChangedListener(new android.text.TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    calcularYMostrarCambio();
+                }
+                @Override public void afterTextChanged(android.text.Editable s) { }
+            });
+        }
+
+        if (tabsMetodoPago != null) {
+            TabLayout.Tab tabMetodo = tabsMetodoPago.getTabAt(metodoPagoSeleccionado.equalsIgnoreCase("Transferencia") ? 1 : 0);
+            if (tabMetodo != null) tabMetodo.select();
+            actualizarVisibilidadEfectivo();
+            tabsMetodoPago.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override public void onTabSelected(TabLayout.Tab tab) {
+                    metodoPagoSeleccionado = tab.getPosition() == 0 ? "Efectivo" : "Transferencia";
+                    actualizarVisibilidadEfectivo();
+                }
+                @Override public void onTabUnselected(TabLayout.Tab tab) { }
+                @Override public void onTabReselected(TabLayout.Tab tab) { }
+            });
         }
 
         if (botonGuardarAtencion != null) {
@@ -110,7 +126,6 @@ public class RegistrarServicioFragment extends Fragment {
         }
 
         cargarCatalogos();
-        textoEmpleadoSeleccionado.setText(empleados.length == 0 ? getString(R.string.registrar_sin_empleados) : empleados[0]);
         TabLayout.Tab seleccionada = vehiculos.getTabAt(esCarroSeleccionado ? 0 : 1);
         if (seleccionada != null) seleccionada.select();
         vehiculos.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -201,7 +216,7 @@ public class RegistrarServicioFragment extends Fragment {
 
     private void actualizarMostrarPrecio() {
         String[] precios = esCarroSeleccionado ? preciosCarro : preciosMoto;
-        botonGuardarAtencion.setEnabled(precios.length > 0 && empleados.length > 0);
+        botonGuardarAtencion.setEnabled(precios.length > 0);
         if (precios.length == 0) {
             textoPrecioTotal.setText(R.string.registrar_sin_servicios);
             return;
@@ -209,48 +224,113 @@ public class RegistrarServicioFragment extends Fragment {
         if (indiceServicioSeleccionado >= 0 && indiceServicioSeleccionado < precios.length) {
             textoPrecioTotal.setText("Precio " + precios[indiceServicioSeleccionado]);
         }
+        calcularYMostrarCambio();
     }
 
-    private void mostrarDialogoSeleccionEmpleado() {
-        if (empleados.length == 0) {
-            Toast.makeText(requireContext(), R.string.registrar_sin_empleados, Toast.LENGTH_SHORT).show();
+    private void actualizarVisibilidadEfectivo() {
+        boolean esEfectivo = metodoPagoSeleccionado.equalsIgnoreCase("Efectivo");
+        if (contenedorEfectivo != null) {
+            contenedorEfectivo.setVisibility(esEfectivo ? View.VISIBLE : View.GONE);
+        }
+        if (esEfectivo) {
+            calcularYMostrarCambio();
+        }
+    }
+
+    private void calcularYMostrarCambio() {
+        if (textoCambioCalculado == null) return;
+        String[] precios = esCarroSeleccionado ? preciosCarro : preciosMoto;
+        if (precios.length == 0 || indiceServicioSeleccionado < 0 || indiceServicioSeleccionado >= precios.length) {
+            textoCambioCalculado.setText("$0.00");
+            textoCambioCalculado.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_black));
             return;
         }
-        new AlertDialog.Builder(requireContext())
-                .setTitle("Seleccionar empleado")
-                .setSingleChoiceItems(empleados, indiceEmpleadoSeleccionado, (dialogo, opcion) -> {
-                    indiceEmpleadoSeleccionado = opcion;
-                    textoEmpleadoSeleccionado.setText(empleados[opcion]);
-                    dialogo.dismiss();
-                })
-                .setNegativeButton("Cancelar", null)
-                .show();
+
+        String precioStr = precios[indiceServicioSeleccionado];
+        long precioCentavos = 0;
+        try {
+            precioCentavos = new java.math.BigDecimal(precioStr.substring(1)).movePointRight(2).longValueExact();
+        } catch (Exception ignored) { }
+
+        String recibidoStr = campoMontoRecibido != null && campoMontoRecibido.getText() != null
+                ? campoMontoRecibido.getText().toString().trim().replace(',', '.') : "";
+
+        if (recibidoStr.isEmpty()) {
+            textoCambioCalculado.setText("$0.00");
+            textoCambioCalculado.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_black));
+            return;
+        }
+
+        try {
+            long recibidoCentavos = new java.math.BigDecimal(recibidoStr).movePointRight(2).longValueExact();
+            if (recibidoCentavos >= precioCentavos) {
+                long cambioCentavos = recibidoCentavos - precioCentavos;
+                textoCambioCalculado.setText("$" + java.math.BigDecimal.valueOf(cambioCentavos, 2).toPlainString());
+                textoCambioCalculado.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_black));
+            } else {
+                long faltaCentavos = precioCentavos - recibidoCentavos;
+                textoCambioCalculado.setText("Falta $" + java.math.BigDecimal.valueOf(faltaCentavos, 2).toPlainString());
+                textoCambioCalculado.setTextColor(Color.parseColor("#DC2626"));
+            }
+        } catch (Exception e) {
+            textoCambioCalculado.setText("$0.00");
+            textoCambioCalculado.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_black));
+        }
     }
 
     private void mostrarDialogoConfirmacionGuardado() {
-        if (empleados.length == 0 || (esCarroSeleccionado ? serviciosCarro : serviciosMoto).length == 0) return;
-        String vehiculo = esCarroSeleccionado ? "Carro" : "Moto";
         String[] servicios = esCarroSeleccionado ? serviciosCarro : serviciosMoto;
+        if (servicios.length == 0) return;
+
+        String cliente = campoCliente != null && campoCliente.getText() != null
+                ? campoCliente.getText().toString().trim() : "";
+        if (cliente.isEmpty()) {
+            if (campoCliente != null) {
+                campoCliente.setError("Ingresa los datos del encargado del vehículo");
+                campoCliente.requestFocus();
+            } else {
+                Toast.makeText(requireContext(), "Ingresa los datos del encargado del vehículo", Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        String vehiculo = esCarroSeleccionado ? "Carro" : "Moto";
         String[] precios = esCarroSeleccionado ? preciosCarro : preciosMoto;
         String servicio = servicios[indiceServicioSeleccionado];
         String precio = precios[indiceServicioSeleccionado];
-        String empleado = empleados[indiceEmpleadoSeleccionado];
         String servicioId = (esCarroSeleccionado ? idsCarro : idsMoto)[indiceServicioSeleccionado];
-        String empleadoId = idsEmpleados[indiceEmpleadoSeleccionado];
+
+        String empleadoId = primerEmpleadoActivoId();
+        if (empleadoId == null) {
+            Toast.makeText(requireContext(), R.string.registrar_sin_empleados, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         long precioConfirmado = new java.math.BigDecimal(precio.substring(1)).movePointRight(2).longValueExact();
 
         View vistaDialogo = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_confirmar_atencion, null);
 
         TextView textoDialogoVehiculo = vistaDialogo.findViewById(R.id.textoDialogoVehiculo);
         TextView textoDialogoServicio = vistaDialogo.findViewById(R.id.textoDialogoServicio);
-        TextView textoDialogoEmpleado = vistaDialogo.findViewById(R.id.textoDialogoEmpleado);
+        TextView textoDialogoCliente = vistaDialogo.findViewById(R.id.textoDialogoCliente);
+        TextView textoDialogoMetodoPago = vistaDialogo.findViewById(R.id.textoDialogoMetodoPago);
         TextView textoDialogoPrecio = vistaDialogo.findViewById(R.id.textoDialogoPrecio);
         MaterialButton botonDialogoCancelar = vistaDialogo.findViewById(R.id.botonDialogoCancelar);
         MaterialButton botonDialogoGuardar = vistaDialogo.findViewById(R.id.botonDialogoGuardar);
 
         textoDialogoVehiculo.setText("• Vehículo: " + vehiculo);
         textoDialogoServicio.setText("• Servicio: " + servicio);
-        textoDialogoEmpleado.setText("• Empleado: " + empleado);
+        textoDialogoCliente.setText("• Encargado: " + cliente);
+        if (textoDialogoMetodoPago != null) {
+            if (metodoPagoSeleccionado.equalsIgnoreCase("Efectivo") && campoMontoRecibido != null
+                    && campoMontoRecibido.getText() != null && !campoMontoRecibido.getText().toString().trim().isEmpty()) {
+                String recibido = campoMontoRecibido.getText().toString().trim();
+                String cambioStr = textoCambioCalculado != null ? textoCambioCalculado.getText().toString() : "$0.00";
+                textoDialogoMetodoPago.setText("• Método de pago: Efectivo (Entregado: $" + recibido + " | Cambio: " + cambioStr + ")");
+            } else {
+                textoDialogoMetodoPago.setText("• Método de pago: " + metodoPagoSeleccionado);
+            }
+        }
         textoDialogoPrecio.setText("• Importe: " + precio);
 
         AlertDialog dialogo = new AlertDialog.Builder(requireContext())
@@ -266,7 +346,7 @@ public class RegistrarServicioFragment extends Fragment {
         botonDialogoGuardar.setOnClickListener(v -> {
             botonDialogoGuardar.setEnabled(false);
             try {
-                if (!new AtencionesStore(requireContext()).registrar(servicioId, empleadoId, precioConfirmado)) {
+                if (!new AtencionesStore(requireContext()).registrar(servicioId, empleadoId, cliente, metodoPagoSeleccionado, precioConfirmado)) {
                     throw new IllegalStateException();
                 }
             } catch (org.json.JSONException | IllegalStateException error) {
@@ -282,6 +362,18 @@ public class RegistrarServicioFragment extends Fragment {
         });
 
         dialogo.show();
+    }
+
+    private String primerEmpleadoActivoId() {
+        try {
+            for (EmpleadosStore.Empleado empleado : new EmpleadosStore(requireContext()).getAll()) {
+                if (empleado.activo) {
+                    return empleado.id;
+                }
+            }
+        } catch (org.json.JSONException ignored) {
+        }
+        return null;
     }
 
     private int dpAPx(float dp) {

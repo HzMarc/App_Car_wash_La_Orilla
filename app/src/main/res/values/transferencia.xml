@@ -1,0 +1,4 @@
+<resources>
+    <string name="transferencia_qr_title">QR para transferencias</string>
+    <string name="transferencia_qr_hint">QR estático de demostración del negocio. No permite pagos reales.</string>
+</resources>

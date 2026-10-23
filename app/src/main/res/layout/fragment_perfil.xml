@@ -1,37 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true"
-    android:background="@color/app_bg">
+    android:background="@color/app_bg" android:clipToPadding="false">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:padding="24dp">
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:paddingHorizontal="20dp" android:paddingTop="24dp" android:paddingBottom="28dp">
+        <TextView android:id="@+id/perfil_titulo" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:text="@string/perfil_title" android:textAppearance="@style/Orilla.ScreenTitle" />
-        <com.google.android.material.card.MaterialCardView style="@style/Cierre.Card"
-            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp">
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+            android:text="@string/perfil_subtitulo" android:textAppearance="@style/Cierre.Caption" android:textSize="14sp" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/app_black" app:cardCornerRadius="24dp" app:cardElevation="0dp" app:strokeWidth="0dp">
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="vertical" android:padding="20dp">
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="@string/perfil_nombre" android:textAppearance="@style/Cierre.Caption" />
+                android:orientation="vertical" android:gravity="center_horizontal" android:padding="24dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="@string/perfil_negocio" android:textColor="@color/app_yellow"
+                    android:fontFamily="sans-serif-medium" android:textSize="11sp" android:letterSpacing="0.16" />
+                <TextView android:id="@+id/perfil_iniciales" android:layout_width="80dp" android:layout_height="80dp"
+                    android:layout_marginTop="24dp" android:background="@drawable/bg_perfil_avatar" android:gravity="center"
+                    android:textColor="@color/app_black" android:textSize="28sp" android:fontFamily="sans-serif-medium"
+                    android:importantForAccessibility="no" tools:text="CM" />
                 <TextView android:id="@+id/perfil_nombre" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp" android:textAppearance="@style/Cierre.Label" android:textSize="22sp" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp"
-                    android:text="@string/perfil_user" android:textAppearance="@style/Cierre.Caption" />
-                <TextView android:id="@+id/perfil_user" android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp" android:textAppearance="@style/Cierre.Label" />
+                    android:layout_marginTop="16dp" android:gravity="center" android:textColor="@color/white"
+                    android:textSize="26sp" android:fontFamily="sans-serif-medium" tools:text="Carlos Mendoza" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp"
+                    android:text="@string/perfil_rol" android:textSize="14sp" android:textColor="@color/perfil_texto_sobre_oscuro" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp" android:background="@drawable/bg_perfil_estado"
+                    android:paddingHorizontal="14dp" android:paddingVertical="8dp"
+                    android:text="@string/perfil_sesion_activa" android:textColor="@color/app_yellow" android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+        <TextView android:id="@+id/perfil_cuenta_titulo" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="28dp" android:layout_marginBottom="12dp" android:text="@string/perfil_cuenta"
+            android:textAppearance="@style/Cierre.Label" android:textSize="16sp" />
         <com.google.android.material.card.MaterialCardView style="@style/Cierre.Card"
-            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp">
+            android:layout_width="match_parent" android:layout_height="wrap_content" app:cardCornerRadius="16dp">
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                android:orientation="vertical" android:padding="20dp">
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:text="@string/perfil_qr_title" android:textAppearance="@style/Cierre.Label" android:textSize="20sp" />
-                <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp" android:text="@string/perfil_qr_hint" android:textAppearance="@style/Cierre.Caption" />
-                <ImageView android:id="@+id/perfil_qr" android:layout_width="match_parent" android:layout_height="280dp"
-                    android:layout_marginTop="16dp" android:background="@color/white" android:padding="16dp"
-                    android:scaleType="fitCenter" android:clickable="true" android:focusable="true"
-                    android:contentDescription="@string/perfil_qr_title" />
+                android:orientation="horizontal" android:gravity="center_vertical" android:padding="18dp">
+                <ImageView android:layout_width="40dp" android:layout_height="40dp" android:padding="8dp"
+                    android:src="@drawable/ic_perfil_usuario" android:importantForAccessibility="no" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginStart="12dp" android:orientation="vertical">
+                    <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:text="@string/perfil_user" android:textAppearance="@style/Cierre.Caption" />
+                    <TextView android:id="@+id/perfil_user" android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp" android:textAppearance="@style/Cierre.Label" android:textSize="16sp" tools:text="Carlos Mendoza" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <TextView android:id="@+id/perfil_accesos_titulo" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="28dp" android:layout_marginBottom="12dp" android:text="@string/perfil_accesos"
+            android:textAppearance="@style/Cierre.Label" android:textSize="16sp" />
+        <com.google.android.material.card.MaterialCardView style="@style/Cierre.Card"
+            android:layout_width="match_parent" android:layout_height="wrap_content" app:cardCornerRadius="16dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <LinearLayout android:id="@+id/perfil_ver_servicios" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical" android:padding="18dp"
+                    android:background="?attr/selectableItemBackground" android:clickable="true" android:focusable="true"
+                    android:contentDescription="@string/perfil_servicios_descripcion">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:padding="8dp"
+                        android:src="@drawable/ic_list" android:importantForAccessibility="no" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:layout_marginHorizontal="12dp" android:orientation="vertical" android:importantForAccessibility="noHideDescendants">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="@string/perfil_servicios" android:textAppearance="@style/Cierre.Label" android:textSize="15sp" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                            android:text="@string/perfil_servicios_hint" android:textAppearance="@style/Cierre.Caption" />
+                    </LinearLayout>
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_perfil_chevron" android:importantForAccessibility="no" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:layout_marginHorizontal="18dp" android:background="@color/app_border" />
+                <LinearLayout android:id="@+id/perfil_ver_caja" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal" android:gravity="center_vertical" android:padding="18dp"
+                    android:background="?attr/selectableItemBackground" android:clickable="true" android:focusable="true"
+                    android:contentDescription="@string/perfil_caja_descripcion">
+                    <ImageView android:layout_width="40dp" android:layout_height="40dp" android:padding="8dp"
+                        android:src="@drawable/ic_perfil_caja" android:importantForAccessibility="no" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:layout_marginHorizontal="12dp" android:orientation="vertical" android:importantForAccessibility="noHideDescendants">
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:text="@string/perfil_caja" android:textAppearance="@style/Cierre.Label" android:textSize="15sp" />
+                        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                            android:text="@string/perfil_caja_hint" android:textAppearance="@style/Cierre.Caption" />
+                    </LinearLayout>
+                    <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_perfil_chevron" android:importantForAccessibility="no" />
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

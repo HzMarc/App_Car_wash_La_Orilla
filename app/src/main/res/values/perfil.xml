@@ -3,7 +3,18 @@
     <string name="perfil_nombre">Nombre del empleado</string>
     <string name="perfil_user">Usuario</string>
     <string name="registrar_empleado_actual">Empleado: %1$s</string>
-    <string name="perfil_qr_title">QR para transferencias</string>
-    <string name="perfil_qr_hint">QR estático de demostración del negocio. No permite pagos reales. Tócalo para ampliarlo.</string>
     <string name="perfil_qr_cerrar">Cerrar</string>
+    <string name="perfil_subtitulo">Tu cuenta y tu actividad en un solo lugar.</string>
+    <string name="perfil_negocio">CARWASH LA ORILLA</string>
+    <string name="perfil_rol">Empleado</string>
+    <string name="perfil_sesion_activa">Sesión activa</string>
+    <string name="perfil_cuenta">Información de la cuenta</string>
+    <string name="perfil_accesos">Mi jornada</string>
+    <string name="perfil_servicios">Mis servicios</string>
+    <string name="perfil_servicios_hint">Consulta tus atenciones registradas</string>
+    <string name="perfil_servicios_descripcion">Mis servicios. Consulta tus atenciones registradas.</string>
+    <string name="perfil_caja">Mi caja</string>
+    <string name="perfil_caja_hint">Revisa tu cierre e historial</string>
+    <string name="perfil_caja_descripcion">Mi caja. Revisa tu cierre e historial.</string>
+    <color name="perfil_texto_sobre_oscuro">#D1D5DB</color>
 </resources>

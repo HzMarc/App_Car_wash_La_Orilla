@@ -85,6 +85,9 @@ public class RegistrarServicioFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            metodoPagoSeleccionado = savedInstanceState.getString("metodo_pago", "Efectivo");
+        }
         View vista = inflater.inflate(R.layout.fragment_registrar_servicio, container, false);
 
         TabLayout vehiculos = vista.findViewById(R.id.registrar_vehiculo_tabs);
@@ -116,9 +119,12 @@ public class RegistrarServicioFragment extends Fragment {
                 @Override public void onTabSelected(TabLayout.Tab tab) {
                     metodoPagoSeleccionado = tab.getPosition() == 0 ? "Efectivo" : "Transferencia";
                     actualizarVisibilidadEfectivo();
+                    if (tab.getPosition() == 1) mostrarQrTransferencia();
                 }
                 @Override public void onTabUnselected(TabLayout.Tab tab) { }
-                @Override public void onTabReselected(TabLayout.Tab tab) { }
+                @Override public void onTabReselected(TabLayout.Tab tab) {
+                    if (tab.getPosition() == 1) mostrarQrTransferencia();
+                }
             });
         }
 
@@ -144,6 +150,18 @@ public class RegistrarServicioFragment extends Fragment {
         renderizarListaServicios();
 
         return vista;
+    }
+
+    @Override public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("metodo_pago", metodoPagoSeleccionado);
+    }
+
+    private void mostrarQrTransferencia() {
+        if (SesionStore.requerir(requireActivity()) == null) return;
+        if (getChildFragmentManager().isStateSaved()
+                || getChildFragmentManager().findFragmentByTag("qr_transferencia") != null) return;
+        new QrTransferenciaBottomSheet().showNow(getChildFragmentManager(), "qr_transferencia");
     }
 
     private void renderizarListaServicios() {

@@ -200,25 +200,38 @@ public class PerfilCierreFlowTest {
         assertEquals(6, new CierresStore(context).historialActual().length());
     }
 
-    @Test public void qrEstaticoDisponibleSinSeleccionYSePuedeAmpliar() throws Exception {
+    @Test public void qrSoloEnTransferenciaSePuedeReabrirYConservaMetodoAlRecrear() throws Exception {
         entrarCarlos();
         onView(withId(R.id.nav_perfil)).perform(click());
-        onView(withId(R.id.perfil_qr)).check(matches(isDisplayed()));
+        onView(withText(R.string.transferencia_qr_title)).check(doesNotExist());
+        onView(withId(R.id.transferencia_qr)).check(doesNotExist());
+        onView(withId(R.id.nav_registrar)).perform(click());
+        onView(withId(R.id.transferencia_qr)).check(doesNotExist());
+        onView(withText("Transferencia")).perform(scrollTo(), click());
+        onView(withId(R.id.transferencia_qr)).check(matches(isDisplayed()));
         onView(withText("Seleccionar QR")).check(doesNotExist());
         onView(withText("Reemplazar QR")).check(doesNotExist());
         onView(withText(containsString("No permite pagos reales"))).check(matches(isDisplayed()));
-        onView(withId(R.id.perfil_qr)).perform(scrollTo(), click());
-        onView(withText("Cerrar")).perform(click());
         scenario.recreate();
-        onView(withId(R.id.perfil_qr)).check(matches(isDisplayed()));
-        capturar("perfil-qr-estatico");
+        onView(withId(R.id.transferencia_qr)).check(matches(isDisplayed()));
+        onView(withId(R.id.transferencia_qr_cerrar)).perform(scrollTo(), click());
+        onView(withId(R.id.contenedorEfectivo)).check(matches(withEffectiveVisibility(Visibility.GONE)));
+        onView(withText("Transferencia")).perform(scrollTo(), click());
+        onView(withId(R.id.transferencia_qr)).check(matches(isDisplayed()));
+        onView(withId(R.id.transferencia_qr_cerrar)).perform(scrollTo(), click());
+        onView(withText("Efectivo")).perform(scrollTo(), click());
+        onView(withId(R.id.transferencia_qr)).check(doesNotExist());
+        onView(withId(R.id.contenedorEfectivo)).check(matches(withEffectiveVisibility(Visibility.VISIBLE)));
         Bitmap primero = new QrNegocioStore(context).cargar();
         assertTrue(new SesionStore(context).iniciar(new EmpleadosStore(context).find(ana)));
         scenario.close();
         scenario = ActivityScenario.launch(MainActivity.class);
         onView(withId(R.id.nav_perfil)).perform(click());
         onView(withId(R.id.perfil_nombre)).check(matches(withText("Ana Gómez")));
-        onView(withId(R.id.perfil_qr)).check(matches(isDisplayed()));
+        onView(withText(R.string.transferencia_qr_title)).check(doesNotExist());
+        onView(withId(R.id.nav_registrar)).perform(click());
+        onView(withText("Transferencia")).perform(scrollTo(), click());
+        onView(withId(R.id.transferencia_qr)).check(matches(isDisplayed()));
         Bitmap segundo = new QrNegocioStore(context).cargar();
         assertTrue(primero.sameAs(segundo));
         primero.recycle();
